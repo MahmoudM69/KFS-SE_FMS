@@ -1,4 +1,4 @@
-﻿namespace Models.DTOModel.ProductDTOs
+﻿namespace Models.DTOModels.ProductDTOs
 {
     public class ProductImageDTO
     {
