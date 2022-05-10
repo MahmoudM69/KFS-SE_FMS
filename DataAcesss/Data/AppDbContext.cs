@@ -4,24 +4,61 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using DataAcesss.Data.EstablishmentModels;
 using DataAcesss.Data.ProductModels;
 using DataAcesss.Data.Shared;
+using DataAcesss.Data.CustomerModels;
+using DataAcesss.Data.EmployeeModels;
+using DataAcesss.Data.OrderModels;
+using DataAcesss.Data.FinancialAidModels;
+using DataAcesss.Data.PaymentModels;
 
 namespace DataAcesss.Data
 {
-    internal class AppDbContext : IdentityDbContext<IdentityUser>
+    public class AppDbContext : IdentityDbContext<IdentityUser>
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) 
         { }
-        public DbSet<Product> Products { get; set; }
         public DbSet<Establishment> Establishments { get; set; }
+        public DbSet<EstablishmentImage> EstablishmentImages { get; set; }
+        public DbSet<EstablishmentType> EstablishmentTypes { get; set; }
+        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+        public DbSet<Employee> Employees { get; set; }
+        public DbSet<Customer> Customers { get; set; }
+        public DbSet<Product> Products { get; set; }
+        public DbSet<ProductImage> ProductImages { get; set; }
+        public DbSet<ProductType> ProductType_FinancialAids { get; set; }
+        public DbSet<FinancialAid> FinancialAids { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<Payment> PaymentServices { get; set; }
+        public DbSet<PaymentService> Payments { get; set; }
+        public DbSet<Establishment_Product> Establishment_Products { get; set; }
+        public DbSet<ProductType_FinancialAid> ProductTypes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
 
+            builder.Entity<Order>().HasOne(c => c.Customer)
+                                   .WithMany(co => co.Orders)
+                                   .HasForeignKey(ci => ci.CustomerId);
+            builder.Entity<Order>().HasOne(pr => pr.Product)
+                                   .WithMany(pro => pro.Orders)
+                                   .HasForeignKey(pri => pri.ProductId);
+            builder.Entity<Order>().HasOne(f => f.FinancialAid)
+                                   .WithMany(fo => fo.Orders)
+                                   .HasForeignKey(fi => fi.FinancialAidId);
+            builder.Entity<Order>().HasOne(p => p.Payment)
+                                   .WithMany(po => po.Orders)
+                                   .HasForeignKey(pi => pi.PaymentId);
+
+            builder.Entity<ProductType_FinancialAid>().HasOne(pt => pt.ProductType)
+                                                   .WithMany(ptfa => ptfa.ProductType_FinancialAids)
+                                                   .HasForeignKey(pti => pti.ProductTypeId);
+            builder.Entity<ProductType_FinancialAid>().HasOne(fa => fa.FinancialAid)
+                                                   .WithMany(ptfa => ptfa.ProductType_FinancialAids)
+                                                   .HasForeignKey(fai => fai.FinancialAidId);
+
             builder.Entity<Establishment_Product>().HasOne(e => e.Establishment)
                                                    .WithMany(ep => ep.Establishment_Products)
                                                    .HasForeignKey(ei => ei.EstablishmentId);
-
             builder.Entity<Establishment_Product>().HasOne(p => p.Product)
                                                    .WithMany(ep => ep.Establishment_Products)
                                                    .HasForeignKey(pi => pi.ProductId);
