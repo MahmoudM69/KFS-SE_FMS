@@ -7,7 +7,9 @@ namespace DataAcesss.Data.EstablishmentModels
     {
         [Key]
         public int EstablishmentImageId { get; set; }
+        [Required]
         public string EstablishmentImageUrl { get; set; }
+
         [ForeignKey("EstablishmentId")]
         public int EstablishmentId { get; set; }
         public virtual Establishment Establishment { get; set; }

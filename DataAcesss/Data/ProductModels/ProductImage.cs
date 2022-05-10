@@ -8,6 +8,7 @@ namespace DataAcesss.Data.ProductModels
         [Key]
         public int ProductImageId { get; set; }
         public string ProductImageUrl { get; set; }
+
         [ForeignKey("ProductId")]
         public int ProductId { get; set; }
         public virtual Product Product { get; set; }
