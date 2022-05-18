@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Models.DTOModels.FinancialAidDTOs;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Models.DTOModels.ProductDTOs
@@ -11,6 +12,8 @@ namespace Models.DTOModels.ProductDTOs
         public string Type { get; set; }
         [Display(Name = "Product Type Description")]
         public string Description { get; set; }
-        public ICollection<ProductDTO> ProductDTOIds { get; set; }
+        public ICollection<int> ProductIds { get; set; }
+        public ICollection<ProductDTO> ProductDTOs { get; set; }
+        public ICollection<FinancialAidDTO> FinancialAidDTOs { get; set; }
     }
 }

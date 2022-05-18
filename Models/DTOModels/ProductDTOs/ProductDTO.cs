@@ -1,4 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Models.DTOModels.EstablishmentDTOs;
+using Models.DTOModels.OrderDTOs;
+using Models.DTOModels.SharedDTOs;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -19,7 +22,12 @@ namespace Models.DTOModels.ProductDTOs
         [DataType(DataType.ImageUrl)]
         [NotMapped]
         public ICollection<IFormFile> Images { get; set; }
-
         public ICollection<string> ProductImageURLs { get; set; }
+        public ICollection<ProductImageDTO> ProductImageDTOs { get; set; }
+        public int ProductTypeId { get; set; }
+        public ProductTypeDTO ProductTypeDTO { get; set; }
+        public ICollection<Establishment_ProductDTO> Establishment_ProductDTOs { get; set; }
+        public ICollection<OrderDTO> OrderDTOs { get; set; }
+
     }
 }

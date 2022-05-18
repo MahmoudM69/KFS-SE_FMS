@@ -21,8 +21,12 @@ namespace Models.DTOModels.FinancialAidDTOs
         [DataType(DataType.Currency)]
         [Display(Name = "Maximum Balance")]
         public decimal MaxBalance { get; set; } = decimal.Zero;
-        public EstablishmentDTO Establishment { get; set; }
-        public ICollection<ProductTypeDTO> ProductTypes { get; set; }
-        public ICollection<OrderDTO> Orders { get; set; }
+        [Required]
+        public bool Percentage { get; set; }
+        [Required]
+        public decimal AidAmount { get; set; }
+        public EstablishmentDTO EstablishmentDTO { get; set; }
+        public ICollection<OrderDTO> OrderDTOs { get; set; }
+        public ICollection<ProductTypeDTO> ProductTypeDTOs { get; set; }
     }
 }

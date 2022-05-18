@@ -7,6 +7,7 @@ namespace Models.DTOModels.PaymentDTOs
     {
         public int PaymentId { get; set; }
         public int PaymentServiceDTOId { get; set; }
+        public PaymentServiceDTO PaymentServiceDTO { get; set; }
         public ICollection<OrderDTO> OrderDTOs { get; set; }
     }
 }
