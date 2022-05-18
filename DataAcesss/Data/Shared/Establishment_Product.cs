@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using DataAcesss.Data.OrderModels;
 using DataAcesss.Data.ProductModels;
 using DataAcesss.Data.EstablishmentModels;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DataAcesss.Data.Shared
 {
@@ -15,6 +17,7 @@ namespace DataAcesss.Data.Shared
         [ForeignKey("EstablishmentId")]
         public int EstablishmentId { get; set; }
         public virtual Establishment Establishment { get; set; }
+        public virtual ICollection<Order> Orders { get; set; }
         public DateTime ProductionDate { get; set; } = DateTime.Now;
         public DateTime ExpirationDate { get; set; } = DateTime.Now;
         [Required]

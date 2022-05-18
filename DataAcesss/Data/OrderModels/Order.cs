@@ -2,8 +2,8 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using DataAcesss.Data.CustomerModels;
 using DataAcesss.Data.PaymentModels;
-using DataAcesss.Data.ProductModels;
 using DataAcesss.Data.FinancialAidModels;
+using DataAcesss.Data.Shared;
 
 namespace DataAcesss.Data.OrderModels
 {
@@ -14,14 +14,14 @@ namespace DataAcesss.Data.OrderModels
         [Required]
         public float Quantity { get; set; }
         [Required]
-        public string Stats { get; set; } = "pending"; // canceled
+        public string Stats { get; set; } = "pending";
 
         [Required, ForeignKey("CustomerId")]
         public string CustomerId { get; set; }
         public virtual Customer Customer { get; set; }
-        [Required, ForeignKey("ProductId")]
-        public int ProductId { get; set; }
-        public virtual Product Product { get; set; }
+        [Required, ForeignKey("Establishment_ProductId")]
+        public int Establishment_ProductId { get; set; }
+        public virtual Establishment_Product Establishment_Product { get; set; }
         [ForeignKey("FinancialAidId")]
         public int FinancialAidId { get; set; }
         public virtual FinancialAid FinancialAid { get; set; }

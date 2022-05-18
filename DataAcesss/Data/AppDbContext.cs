@@ -24,13 +24,13 @@ namespace DataAcesss.Data
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductImage> ProductImages { get; set; }
-        public DbSet<ProductType> ProductType_FinancialAids { get; set; }
+        public DbSet<ProductType> ProductTypes { get; set; }
         public DbSet<FinancialAid> FinancialAids { get; set; }
         public DbSet<Order> Orders { get; set; }
-        public DbSet<Payment> PaymentServices { get; set; }
-        public DbSet<PaymentService> Payments { get; set; }
+        public DbSet<Payment> Payments { get; set; }
+        public DbSet<PaymentService> PaymentServices { get; set; }
         public DbSet<Establishment_Product> Establishment_Products { get; set; }
-        public DbSet<ProductType_FinancialAid> ProductTypes { get; set; }
+        public DbSet<ProductType_FinancialAid> ProductType_FinancialAids { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -39,9 +39,9 @@ namespace DataAcesss.Data
             builder.Entity<Order>().HasOne(c => c.Customer)
                                    .WithMany(co => co.Orders)
                                    .HasForeignKey(ci => ci.CustomerId);
-            builder.Entity<Order>().HasOne(pr => pr.Product)
-                                   .WithMany(pro => pro.Orders)
-                                   .HasForeignKey(pri => pri.ProductId);
+            builder.Entity<Order>().HasOne(espr => espr.Establishment_Product)
+                                   .WithMany(espro => espro.Orders)
+                                   .HasForeignKey(espri => espri.Establishment_ProductId);
             builder.Entity<Order>().HasOne(f => f.FinancialAid)
                                    .WithMany(fo => fo.Orders)
                                    .HasForeignKey(fi => fi.FinancialAidId);

@@ -15,6 +15,10 @@ namespace DataAcesss.Data.FinancialAidModels
         public decimal MinBalance { get; set; }
         [Required]
         public decimal MaxBalance { get; set; }
+        [Required]
+        public bool Percentage { get; set; }
+        [Required]
+        public decimal AidAmount { get; set; }
 
         [Required, ForeignKey("EstablishmentId")]
         public int EstablishmentId { get; set; }

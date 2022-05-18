@@ -19,10 +19,5 @@ namespace DataAcesss.Data.Shared
         [ForeignKey("FinancialAidId")]
         public int FinancialAidId { get; set; }
         public virtual FinancialAid FinancialAid { get; set; }
-
-        [Required]
-        public bool Percentage { get; set; }
-        [Required]
-        public decimal AidAmount { get; set; }
     }
 }
