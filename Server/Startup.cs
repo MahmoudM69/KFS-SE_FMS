@@ -1,3 +1,13 @@
+using Business.IRepository.IEstablishmentRepositories;
+using Business.IRepository.IFinancialAidRepositories;
+using Business.IRepository.IOrderRepositories;
+using Business.IRepository.IPaymentRepositories;
+using Business.IRepository.IProductRepositories;
+using Business.Repository.EstablishmentRepositories;
+using Business.Repository.FinancialAidRepositories;
+using Business.Repository.OrderRepositories;
+using Business.Repository.PaymentRepositories;
+using Business.Repository.ProductRepositories;
 using DataAcesss.Data;
 using DataAcesss.Data.Shared;
 using Microsoft.AspNetCore.Builder;
@@ -33,6 +43,7 @@ namespace Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            // services.AddDbContext<AppDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("MSSQL")));
             services.AddDbContextPool<AppDbContext>(options => options.UseMySQL(Configuration.GetConnectionString("MySql")));
             services.AddIdentity<ApplicationUser, IdentityRole>(options =>
             {
@@ -47,6 +58,17 @@ namespace Server
             services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<ApplicationUser>>();
             services.AddDatabaseDeveloperPageExceptionFilter();
             services.AddSingleton<WeatherForecastService>();
+
+            services.AddScoped<IEstablishmentRepository, EstablishmentRepository>();
+            services.AddScoped<IEstablishmentTypeRepository, EstablishmentTypeRepository>();
+            services.AddScoped<IEstablishmentImageRepository, EstablishmentImageRepository>();
+            services.AddScoped<IFinancialAidRepository, FinancialAidRepository>();
+            services.AddScoped<IOrderRepository, OrderRepository>();
+            services.AddScoped<IPaymentRepository, PaymentRepository>();
+            services.AddScoped<IPaymentServiceRepository, PaymentServiceRepository>();
+            services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<IProductTypeRepository, ProductTypeRepository>();
+            services.AddScoped<IProductImageRepository, ProductImageRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

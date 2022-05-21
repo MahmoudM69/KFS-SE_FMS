@@ -1,0 +1,58 @@
+﻿@page "/Product/Create"
+@page "/Product/Edit/{id:int}"
+@using Business.IRepository.IProductRepositories
+@using Models.DTOModels.ProductDTOs
+@inject IProductRepository ProductRepository
+<h1>@title</h1>
+
+<h4>Product</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm Model="productDTO" OnValidSubmit="Submit">
+            <DataAnnotationsValidator/>
+            <ValidationSummary/>
+            <div class="form-group">
+                <label>Product Name</label>
+                <InputText @bind-Value="productDTO.ProductName"></InputText>
+                <ValidationMessage For="() => productDTO.ProductName"></ValidationMessage>
+            </div>
+            <div class="form-group">
+                <label>Product Description</label>
+                <InputTextArea @bind-Value="productDTO.ProductDescription"></InputTextArea>
+                <ValidationMessage For="() => productDTO.ProductDescription"></ValidationMessage>
+            </div>
+            <div class="form-group">
+                <label>Product Name</label>
+                <InputText @bind-Value="productDTO.ProductName"></InputText>
+            </div>
+            <div class="form-group">
+                <button class="btn btn-primary" type="submit"></button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a asp-page="Index">Back to List</a>
+</div>
+
+@code {
+    public string title { get; set; } = "Create";
+    [Parameter]
+    public int? id { get; set; }
+    private ProductDTO productDTO { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if(id != null)
+        {
+            title = "Edit";
+            productDTO = await ProductRepository.GetProduct(id.Value);
+        }
+    }
+    private async void Submit()
+    {
+        
+    }
+}

@@ -1,0 +1,35 @@
+﻿@page "/Product"
+@using Business.IRepository.IProductRepositories
+@using Models.DTOModels.ProductDTOs
+@inject IProductRepository productRepo
+
+<h1>Index</h1>
+
+<p>
+    <a asp-page="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@*@foreach (var item in Model.Establishment) {*@
+        <tr>
+            @*<td>
+                @Html.DisplayFor(modelItem => item.EstablishmentType.Type)
+            </td>
+            <td>
+                <a asp-page="./Edit" asp-route-id="@item.EstablishmentId">Edit</a> |
+                <a asp-page="./Details" asp-route-id="@item.EstablishmentId">Details</a> |
+                <a asp-page="./Delete" asp-route-id="@item.EstablishmentId">Delete</a>
+            </td>*@
+        </tr>
+}
+    </tbody>
+</table>
+
+@code {
+}

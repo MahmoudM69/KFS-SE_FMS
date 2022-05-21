@@ -1,0 +1,25 @@
+﻿@page
+@model Server.Pages.EstablishmentTypePages.DetailsModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>EstablishmentType</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.EstablishmentType.Type)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.EstablishmentType.Type)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-page="./Edit" asp-route-id="@Model.EstablishmentType.EstablishmentTypeId">Edit</a> |
+    <a asp-page="./Index">Back to List</a>
+</div>
