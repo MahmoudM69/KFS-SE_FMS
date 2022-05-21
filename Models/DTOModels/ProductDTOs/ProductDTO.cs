@@ -19,10 +19,7 @@ namespace Models.DTOModels.ProductDTOs
         [Display(Name = "Product Description")]
         public string ProductDescription { get; set; }
 
-        [DataType(DataType.ImageUrl)]
-        [NotMapped]
-        public ICollection<IFormFile> Images { get; set; }
-        public ICollection<string> ProductImageURLs { get; set; }
+        public List<string> ProductImageURLs { get; set; }
         public ICollection<ProductImageDTO> ProductImageDTOs { get; set; }
         public int ProductTypeId { get; set; }
         public ProductTypeDTO ProductTypeDTO { get; set; }

@@ -1,8 +1,11 @@
 ﻿@page "/Product/Create"
 @page "/Product/Edit/{id:int}"
 @using Business.IRepository.IProductRepositories
+@using Business.IRepository.ISharedRepository
 @using Models.DTOModels.ProductDTOs
+@using System.IO
 @inject IProductRepository ProductRepository
+@inject IFileUploadRepository FileUploadRepository
 <h1>@title</h1>
 
 <h4>Product</h4>
@@ -14,20 +17,20 @@
             <ValidationSummary/>
             <div class="form-group">
                 <label>Product Name</label>
-                <InputText @bind-Value="productDTO.ProductName"></InputText>
+                <InputText @bind-Value="productDTO.ProductName" class="form-control"></InputText>
                 <ValidationMessage For="() => productDTO.ProductName"></ValidationMessage>
             </div>
             <div class="form-group">
                 <label>Product Description</label>
-                <InputTextArea @bind-Value="productDTO.ProductDescription"></InputTextArea>
+                <InputTextArea @bind-Value="productDTO.ProductDescription" class="form-control"></InputTextArea>
                 <ValidationMessage For="() => productDTO.ProductDescription"></ValidationMessage>
             </div>
             <div class="form-group">
-                <label>Product Name</label>
-                <InputText @bind-Value="productDTO.ProductName"></InputText>
+                <label>Product Images</label>
+                <InputFile OnChange="UploadImages" multiple></InputFile>
             </div>
             <div class="form-group">
-                <button class="btn btn-primary" type="submit"></button>
+                <button class="btn btn-primary" type="submit" value="@title"></button>
             </div>
         </EditForm>
     </div>
@@ -51,6 +54,35 @@
             productDTO = await ProductRepository.GetProduct(id.Value);
         }
     }
+    private async Task UploadImages(InputFileChangeEventArgs e)
+    {
+        List<string> Images = new();
+        if(e.GetMultipleFiles().Any())
+        {
+            foreach(var file in e.GetMultipleFiles())
+            {
+                FileInfo fileInfo = new FileInfo(file.Name);
+                if(fileInfo.Extension.ToLower() == ".jpg" || 
+                   fileInfo.Extension.ToLower() == ".jpeg" || 
+                   fileInfo.Extension.ToLower() == ".png" )
+                {
+                    var uploadImage = await FileUploadRepository.UploadImage("Product", file);
+                    Images.Add(uploadImage);
+                }
+            }
+            if(Images.Any())
+            {
+                if(productDTO.ProductImageURLs.Any())
+                    productDTO.ProductImageURLs.AddRange(Images);
+                else
+                {
+                    productDTO.ProductImageURLs = new();
+                    productDTO.ProductImageURLs.AddRange(Images);
+                }
+            }
+        }
+    }
+
     private async void Submit()
     {
         

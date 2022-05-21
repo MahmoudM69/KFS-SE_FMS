@@ -3,11 +3,13 @@ using Business.IRepository.IFinancialAidRepositories;
 using Business.IRepository.IOrderRepositories;
 using Business.IRepository.IPaymentRepositories;
 using Business.IRepository.IProductRepositories;
+using Business.IRepository.ISharedRepository;
 using Business.Repository.EstablishmentRepositories;
 using Business.Repository.FinancialAidRepositories;
 using Business.Repository.OrderRepositories;
 using Business.Repository.PaymentRepositories;
 using Business.Repository.ProductRepositories;
+using Business.Repository.SharedRepository;
 using DataAcesss.Data;
 using DataAcesss.Data.Shared;
 using Microsoft.AspNetCore.Builder;
@@ -69,6 +71,7 @@ namespace Server
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IProductTypeRepository, ProductTypeRepository>();
             services.AddScoped<IProductImageRepository, ProductImageRepository>();
+            services.AddScoped<IFileUploadRepository, FileUploadRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
