@@ -1,10 +1,14 @@
 ﻿using AutoMapper;
+using DataAcesss.Data.CustomerModels;
+using DataAcesss.Data.EmployeeModels;
 using DataAcesss.Data.EstablishmentModels;
 using DataAcesss.Data.FinancialAidModels;
 using DataAcesss.Data.OrderModels;
 using DataAcesss.Data.PaymentModels;
 using DataAcesss.Data.ProductModels;
 using DataAcesss.Data.Shared;
+using Models.DTOModels.CustomerDTOs;
+using Models.DTOModels.EmpolyeeDTOs;
 using Models.DTOModels.EstablishmentDTOs;
 using Models.DTOModels.FinancialAidDTOs;
 using Models.DTOModels.OrderDTOs;
@@ -27,6 +31,10 @@ namespace Business.Mapper
             CreateMap<EstablishmentType, EstablishmentTypeDTO>().ReverseMap().ForMember(x => x.Establishments, y => y.MapFrom(z => z.EstablishmentDTOs));
 
             CreateMap<EstablishmentImage, EstablishmentImageDTO>().ReverseMap().ForMember(x => x.Establishment, y => y.MapFrom(z => z.EstablishmentDTO));
+
+            CreateMap<Employee, EmployeeDTO>().ReverseMap().ForMember(x => x.Establishment, y => y.MapFrom(z => z.EstablishmentDTO));
+
+            CreateMap<Customer, CustomerDTO>().ReverseMap();
 
             CreateMap<Product, ProductDTO>().ReverseMap().ForMember(x => x.ProductType, y => y.MapFrom(z => z.ProductTypeDTO))
                                                          .ForMember(x => x.Orders, y => y.MapFrom(z => z.OrderDTOs))

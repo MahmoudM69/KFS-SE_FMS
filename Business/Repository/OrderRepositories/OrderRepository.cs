@@ -48,7 +48,7 @@ namespace Business.Repository.OrderRepositories
                 Order order = await context.Orders.Include(x => x.Establishment_Product).ThenInclude(y => y.Product)
                                                   .Include(x => x.Establishment_Product).ThenInclude(y => y.Establishment)
                                                   .Include(x => x.Customer)
-                                                  .Include(x => x.FinancialAidId)
+                                                  .Include(x => x.FinancialAid)
                                                   .Include(x => x.Payment)
                                                   .FirstOrDefaultAsync(x => x.OrderId == id);
                 if (order != null)
@@ -78,7 +78,7 @@ namespace Business.Repository.OrderRepositories
             ICollection<Order> orders = await context.Orders.Include(x => x.Customer)
                                                                           .Include(x => x.Establishment_Product).ThenInclude(y => y.Product)
                                                                           .Include(x => x.Establishment_Product).ThenInclude(y => y.Establishment)
-                                                                          .Include(x => x.FinancialAidId)
+                                                                          .Include(x => x.FinancialAid)
                                                                           .Include(x => x.Payment)
                                                                           .Include(x => x.Payment).ToListAsync();
             if (orders.Any())

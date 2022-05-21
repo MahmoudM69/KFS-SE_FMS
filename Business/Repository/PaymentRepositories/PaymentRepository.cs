@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Business.Repository.PaymentRepositories
 {
-    internal class PaymentRepository : IPaymentRepository
+    public class PaymentRepository : IPaymentRepository
     {
         private readonly AppDbContext context;
         private readonly IMapper mapper;
@@ -44,6 +44,9 @@ namespace Business.Repository.PaymentRepositories
             if (id.ToString() != null)
             {
                 Payment payment = await context.Payments.Include(x => x.PaymentService)
+                                                        .Include(x => x.Orders).ThenInclude(y => y.Customer)
+                                                        .Include(x => x.Orders).ThenInclude(y => y.Establishment_Product)
+                                                        .Include(x => x.Orders).ThenInclude(y => y.FinancialAid)
                                                         .FirstOrDefaultAsync(x => x.PaymentId == id);
                 if (payment != null)
                 {
@@ -53,9 +56,13 @@ namespace Business.Repository.PaymentRepositories
             return null;
         }
 
-        public ICollection<PaymentDTO> GetAllPayments()
+        public async Task<ICollection<PaymentDTO>> GetAllPayments()
         {
-            ICollection<Payment> payments = context.Payments.ToList();
+            ICollection<Payment> payments = await context.Payments.Include(x => x.PaymentService)
+                                                            .Include(x => x.Orders).ThenInclude(y => y.Customer)
+                                                            .Include(x => x.Orders).ThenInclude(y => y.Establishment_Product)
+                                                            .Include(x => x.Orders).ThenInclude(y => y.FinancialAid)
+                                                            .ToListAsync();
             if (payments.Any())
             {
                 return mapper.Map<ICollection<PaymentDTO>>(payments);
@@ -67,8 +74,10 @@ namespace Business.Repository.PaymentRepositories
         {
             if (id.ToString() != null)
             {
-                Payment payment = await context.Payments.Include(x => x.Orders)
-                                                        .Include(x => x.PaymentService)
+                Payment payment = await context.Payments.Include(x => x.PaymentService)
+                                                        .Include(x => x.Orders).ThenInclude(y => y.Customer)
+                                                        .Include(x => x.Orders).ThenInclude(y => y.Establishment_Product)
+                                                        .Include(x => x.Orders).ThenInclude(y => y.FinancialAid)
                                                         .FirstOrDefaultAsync(x => x.PaymentId == id);
                 if (payment != null)
                 {
