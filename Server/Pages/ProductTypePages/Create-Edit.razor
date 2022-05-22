@@ -1,0 +1,81 @@
+﻿@page "/ProductType/Create"
+@page "/ProductType/Edit/{id:int}"
+@using Business.IRepository.IProductRepositories
+@using Models.DTOModels.ProductDTOs
+@using System.IO
+@inject NavigationManager NavigationManager
+@inject IProductTypeRepository ProductTypeRepository
+<style>
+    .room-image{
+        display: block;
+        width: 100%;
+        height: 150px;
+        background-size: cover !important;
+        border: 3px solid green;
+        position: relative;
+    }
+    .room-image-title{
+        position:absolute;
+        top:0;
+        right:0;
+        background-color:green;
+        color:white;
+        padding:0px 6px;
+        display:inline-block;
+    }
+</style>
+<h1>@title</h1>
+
+<h4>ProductType</h4>
+<hr />
+<div class="row">
+    <div class="col-md-12">
+        <EditForm Model="ProductTypeDTO" OnValidSubmit="Submit">
+            <DataAnnotationsValidator/>
+            <ValidationSummary/>
+            <div class="form-group">
+                <label>ProductType Name</label>
+                <InputText @bind-Value="ProductTypeDTO.Type" class="form-control"></InputText>
+                <ValidationMessage For="() => ProductTypeDTO.Type"></ValidationMessage>
+            </div>
+            <div class="form-group">
+                <label>ProductType Description</label>
+                <InputTextArea @bind-Value="ProductTypeDTO.Description" class="form-control"></InputTextArea>
+                <ValidationMessage For="() => ProductTypeDTO.Description"></ValidationMessage>
+            </div>
+            <div class="form-group">
+                <button class="btn btn-primary" type="submit">@title</button>
+                <button class="btn btn-primary col-6" type="reset">Reset</button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+<div>
+    <a asp-page="Index">Back to List</a>
+</div>
+
+@code {
+    public string title { get; set; } = "Create";
+    [Parameter]
+    public int? id { get; set; }
+    private ProductTypeDTO ProductTypeDTO { get; set; } = new();
+    protected override async Task OnInitializedAsync()
+    {
+        if(id != null)
+        {
+            title = "Edit";
+            ProductTypeDTO = await ProductTypeRepository.GetProductType(id.Value);
+        }
+    }
+    private async void Submit()
+    {
+        if (title == "Create")
+        {
+            var createdProduct = await ProductTypeRepository.CreateProductType(ProductTypeDTO);
+        }
+        else
+        {
+            var createdProduct = await ProductTypeRepository.UpdateProductType(id.Value, ProductTypeDTO);
+        }
+    }
+}

@@ -20,11 +20,12 @@ namespace Business.Repository.SharedRepository
             try
             {
                 FileInfo fileInfo = new FileInfo(file.Name);
-                var fileName = file.Name + Guid.NewGuid().ToString() + fileInfo.Extension;
+                var fileName = Path.GetFileNameWithoutExtension(file.Name) + Guid.NewGuid().ToString() + fileInfo.Extension;
                 var folderDir = $"{hostEnvironment.WebRootPath}\\Images\\{folder}";
                 var path = Path.Combine(hostEnvironment.WebRootPath, "Images", folder, fileName);
                 MemoryStream memoryStream = new MemoryStream();
-                if(!Directory.Exists(folderDir))
+                await file.OpenReadStream().CopyToAsync(memoryStream);
+                if (!Directory.Exists(folderDir))
                 {
                     Directory.CreateDirectory(folderDir);
                 }
@@ -37,7 +38,7 @@ namespace Business.Repository.SharedRepository
             }
             catch(Exception ex)
             {
-                throw ex;
+                throw;
             }
         }
 
@@ -53,7 +54,7 @@ namespace Business.Repository.SharedRepository
             }
             catch(Exception ex)
             {
-                throw ex;
+                throw;
             }
         }
     }

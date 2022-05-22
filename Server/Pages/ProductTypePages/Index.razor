@@ -1,0 +1,69 @@
+﻿@page "/ProductType"
+@using Business.IRepository.IProductRepositories
+@using Models.DTOModels.ProductDTOs
+@inject IProductTypeRepository ProductTypeRepository
+
+<div class="row mt-4">
+    <div class="col-8">
+        <h4 class="card-title text-info">Product Types</h4>
+    </div>
+    <div class="col-3 offset-1">
+        <NavLink href="ProductType/Create" class="btn btn-info form-control">Add New Product Type</NavLink>
+    </div>
+</div>
+<div class="row mt-4">
+    <div class="col-12">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (productTypeDTOs != null)
+                {
+                    @foreach (var productType in productTypeDTOs)
+                    {
+                        <tr>
+                            <td>@productType.ProductTypeId</td>
+                            <td>@productType.Type</td>
+                            <td>@productType.Description</td>
+                            <td>
+                                <NavLink href="@($"ProductType/Edit/{productType.ProductTypeId}")" class="btn btn-primary">Edit</NavLink>
+                                <button class="btn btn-danger" @onclick="()=>DeleteProduct(productType.ProductTypeId)">Delete</button>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td>
+                            No Data Available
+                        </td>
+                    </tr>  
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@code {
+    public ICollection<ProductTypeDTO> productTypeDTOs { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        productTypeDTOs = await ProductTypeRepository.GetAllProductsType();
+    }
+    private async Task DeleteProduct(int Id)
+    {
+        ProductTypeDTO productTypeDTO = await ProductTypeRepository.GetProductType(Id);
+        if(productTypeDTO != null)
+        {
+            ProductTypeRepository.DeleteProductType(Id);
+            productTypeDTOs = await ProductTypeRepository.GetAllProductsType();
+        }
+    }
+}

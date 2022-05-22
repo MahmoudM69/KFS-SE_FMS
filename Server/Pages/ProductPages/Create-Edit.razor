@@ -4,38 +4,96 @@
 @using Business.IRepository.ISharedRepository
 @using Models.DTOModels.ProductDTOs
 @using System.IO
+@inject NavigationManager NavigationManager
 @inject IProductRepository ProductRepository
+@inject IProductTypeRepository ProductTypeRepository
+@inject IProductImageRepository ProductImageRepository
 @inject IFileUploadRepository FileUploadRepository
-<h1>@title</h1>
+<style>
+    .room-image{
+        display: block;
+        width: 100%;
+        height: 150px;
+        background-size: cover !important;
+        border: 3px solid green;
+        position: relative;
+    }
+    .room-image-title{
+        position:absolute;
+        top:0;
+        right:0;
+        background-color:green;
+        color:white;
+        padding:0px 6px;
+        display:inline-block;
+    }
+</style>
+<div class="row mt-2 mb-5">
+    <h3 class="card-title text-info mb-3 ml-3">@title Hotel Room</h3>
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <EditForm Model="productDTO" OnValidSubmit="Submit">
+                    <DataAnnotationsValidator/>
+                    <ValidationSummary/>
+                    <div class="form-group">
+                        <label>Product Name</label>
+                        <InputText @bind-Value="productDTO.ProductName" class="form-control"></InputText>
+                        <ValidationMessage For="() => productDTO.ProductName"></ValidationMessage>
+                    </div>
+                    <div class="form-group">
+                        <label>Product Description</label>
+                        <InputTextArea @bind-Value="productDTO.ProductDescription" class="form-control"></InputTextArea>
+                        <ValidationMessage For="() => productDTO.ProductDescription"></ValidationMessage>
+                    </div>
+                    <div class="form-group">
+                        <label>Product Description</label>
+                        <InputSelect @bind-Value="productDTO.ProductTypeId" class="form-control">
+                            @if (productTypeDTOs != null && productTypeDTOs.Any())
+                            {
+                                foreach (var productTypeDTO in productTypeDTOs)
+                                {
+                                    <option value="@productTypeDTO.ProductTypeId">@productTypeDTO.Type</option>
+                                }
 
-<h4>Product</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <EditForm Model="productDTO" OnValidSubmit="Submit">
-            <DataAnnotationsValidator/>
-            <ValidationSummary/>
-            <div class="form-group">
-                <label>Product Name</label>
-                <InputText @bind-Value="productDTO.ProductName" class="form-control"></InputText>
-                <ValidationMessage For="() => productDTO.ProductName"></ValidationMessage>
+                            }
+                            else
+                            {
+                                <option value="" disabled>No Product Type</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="() => productDTO.ProductDescription"></ValidationMessage>
+                    </div>
+                    <div class="form-group">
+                        <label>Product Images</label>
+                        <InputFile class="form-control" OnChange="UploadImages" multiple></InputFile>
+                        <div class="row">
+                            @if (productDTO.ProductImageURLs != null && productDTO.ProductImageURLs.Count() > 0)
+                            {
+                                int name = 1;
+                                foreach(var image in productDTO.ProductImageURLs)
+                                {
+                                    <div class="col-md-2 mt-3">
+                                        <div class="room-image" style="background: url(@image) 50% 50%; border-radius:5px;">
+                                            <span class="room-image-title">@name</span>
+                                        </div>
+                                        <button type="button" class="btn btn-outline-danger btn-block mt-4" @onclick="()=>RemoveImage(image)">Delete</button>
+                                    </div>
+                                    name++;
+                                }
+                            }
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-success col-4" type="submit">@title Proudct</button>
+                        <button class="btn btn-primary col-4" type="reset">Reset</button>
+                        <NavLink href="Product" class="btn btn-secondary col-4">Back to Index</NavLink>
+                    </div>
+                </EditForm>
             </div>
-            <div class="form-group">
-                <label>Product Description</label>
-                <InputTextArea @bind-Value="productDTO.ProductDescription" class="form-control"></InputTextArea>
-                <ValidationMessage For="() => productDTO.ProductDescription"></ValidationMessage>
-            </div>
-            <div class="form-group">
-                <label>Product Images</label>
-                <InputFile OnChange="UploadImages" multiple></InputFile>
-            </div>
-            <div class="form-group">
-                <button class="btn btn-primary" type="submit" value="@title"></button>
-            </div>
-        </EditForm>
+        </div>
     </div>
 </div>
-
 <div>
     <a asp-page="Index">Back to List</a>
 </div>
@@ -45,9 +103,10 @@
     [Parameter]
     public int? id { get; set; }
     private ProductDTO productDTO { get; set; } = new();
-
+    public ICollection<ProductTypeDTO> productTypeDTOs { get; set; }
     protected override async Task OnInitializedAsync()
     {
+        productTypeDTOs = await ProductTypeRepository.GetAllProductsType();
         if(id != null)
         {
             title = "Edit";
@@ -72,7 +131,7 @@
             }
             if(Images.Any())
             {
-                if(productDTO.ProductImageURLs.Any())
+                if(productDTO.ProductImageURLs != null && productDTO.ProductImageURLs.Any())
                     productDTO.ProductImageURLs.AddRange(Images);
                 else
                 {
@@ -82,9 +141,50 @@
             }
         }
     }
-
+    private void RemoveImage(string url)
+    {
+        var ImgIndex = productDTO.ProductImageURLs.FindIndex(x => x == url);
+        productDTO.ProductImageURLs.RemoveAt(ImgIndex);
+    }
+    private void DeleteImage(string img)
+    {
+        FileUploadRepository.DeleteImage("Product", img);
+    }
+    private async Task UpdateHotelRoomImage(ProductDTO productDTO)
+    {
+        foreach (var imageUrl in productDTO.ProductImageURLs)
+        {
+            if(!productDTO.ProductImageDTOs.Any() || productDTO.ProductImageDTOs.Where(x => x.ProductImageURL == imageUrl) == null)
+            {
+                ProductImageDTO ImageDTO = new ProductImageDTO()
+                {
+                    ProductId = productDTO.ProductId,
+                    ProductDTO = productDTO,
+                    ProductImageURL = imageUrl
+                };
+                await ProductImageRepository.CreateProductImage(ImageDTO);
+            }
+        }
+        foreach (var ImageDTO in productDTO.ProductImageDTOs)
+        {
+            if(productDTO.ProductImageURLs.Where(x => x == ImageDTO.ProductImageURL) == null)
+            {
+                ProductImageRepository.DeleteProductImageByImageId(ImageDTO.ProductImageId);
+                DeleteImage(ImageDTO.ProductImageURL);
+            }
+        }
+    }
     private async void Submit()
     {
-        
+        if (title == "Create")
+        {
+            var createdProduct = await ProductRepository.CreateProduct(productDTO);
+            await UpdateHotelRoomImage(productDTO);
+        }
+        else
+        {
+            var createdProduct = await ProductRepository.UpdateProduct(id.Value, productDTO);
+            await UpdateHotelRoomImage(productDTO);
+        }
     }
 }

@@ -1,35 +1,91 @@
 ﻿@page "/Product"
+@page "/Establishment/{id:int}/Product"
+@using Business.IRepository.IEstablishmentRepositories
 @using Business.IRepository.IProductRepositories
+@using Business.IRepository.ISharedRepository
+@using Models.DTOModels.EstablishmentDTOs
 @using Models.DTOModels.ProductDTOs
-@inject IProductRepository productRepo
+@inject NavigationManager NavigationManager
+@inject IFileUploadRepository FileUploadRepository
+@inject IProductRepository ProductRepository
+@inject IEstablishmentRepository EstablishmentRepository
 
-<h1>Index</h1>
-
-<p>
-    <a asp-page="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@*@foreach (var item in Model.Establishment) {*@
-        <tr>
-            @*<td>
-                @Html.DisplayFor(modelItem => item.EstablishmentType.Type)
-            </td>
-            <td>
-                <a asp-page="./Edit" asp-route-id="@item.EstablishmentId">Edit</a> |
-                <a asp-page="./Details" asp-route-id="@item.EstablishmentId">Details</a> |
-                <a asp-page="./Delete" asp-route-id="@item.EstablishmentId">Delete</a>
-            </td>*@
-        </tr>
-}
-    </tbody>
-</table>
+<div class="row mt-4">
+    <div class="col-8">
+        <h4 class="card-title text-info">Products</h4>
+    </div>
+    <div class="col-3 offset-1">
+        <NavLink href="Product/Create" class="btn btn-info form-control">Add New Product</NavLink>
+    </div>
+</div>
+<div class="row mt-4">
+    <div class="col-12">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if(productDTOs != null)
+                {
+                    @foreach (var product in productDTOs) {
+                        <tr>
+                            <td>@product.ProductId</td>
+                            <td>@product.ProductName</td>
+                            <td>@product.ProductDescription</td>
+                            <td>
+                                <NavLink href="@($"Product/Edit/{product.ProductId}")" class="btn btn-primary">Edit</NavLink>
+                                <button class="btn btn-danger" @onclick="()=>DeleteProduct(product.ProductId)">Delete</button>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td>
+                            No Data Available
+                        </td>
+                    </tr>  
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
 
 @code {
+    [Parameter]
+    public int? id { get; set; }
+
+    public ICollection<ProductDTO> productDTOs { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        if(id != null)
+        {
+            EstablishmentDTO establishmentDTO = await EstablishmentRepository.GetEstablishment(id.Value);
+            foreach(var establishment in establishmentDTO.Establishment_ProductDTOs)
+            {
+                productDTOs.Add(establishment.ProductDTO);
+            }
+        }
+        else
+        {
+            productDTOs = await ProductRepository.GetAllProducts();
+        }
+    }
+    private async Task DeleteProduct(int Id)
+    {
+        ProductDTO productDTO = await ProductRepository.GetProduct(Id);
+        foreach (var imageUrl in productDTO.ProductImageURLs)
+        {
+            var imageName = imageUrl.Replace($"{NavigationManager.BaseUri}Images/", "");
+            FileUploadRepository.DeleteImage("Product",imageName);
+        }
+        ProductRepository.DeleteProduct(Id);
+        productDTOs = await ProductRepository.GetAllProducts();
+    }
 }

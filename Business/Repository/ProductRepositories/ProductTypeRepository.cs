@@ -28,20 +28,24 @@ namespace Business.Repository.ProductRepositories
             if(productTypeDTO != null)
             {
                 ProductType productType = mapper.Map<ProductType>(productTypeDTO);
-                foreach (FinancialAidDTO financialAidDTO in productTypeDTO.FinancialAidDTOs)
+                if(productTypeDTO.FinancialAidDTOs != null)
                 {
-                    ProductType_FinancialAid productType_FinancialAid = new()
+                    foreach (FinancialAidDTO financialAidDTO in productTypeDTO.FinancialAidDTOs)
                     {
-                        ProductTypeId = productType.ProductTypeId,
-                        ProductType = productType,
-                        FinancialAidId = financialAidDTO.FinancialAidId,
-                        FinancialAid = mapper.Map<FinancialAid>(financialAidDTO)
-                    };
-                    productType.ProductType_FinancialAids.Add(productType_FinancialAid);
+                        ProductType_FinancialAid productType_FinancialAid = new()
+                        {
+                            ProductTypeId = productType.ProductTypeId,
+                            ProductType = productType,
+                            FinancialAidId = financialAidDTO.FinancialAidId,
+                            FinancialAid = mapper.Map<FinancialAid>(financialAidDTO)
+                        };
+                        productType.ProductType_FinancialAids.Add(productType_FinancialAid);
+                    }
                 }
+                
                 var dbProductType = await context.ProductTypes.AddAsync(productType);
                 await context.SaveChangesAsync();
-                return mapper.Map<ProductTypeDTO>(dbProductType);
+                return mapper.Map<ProductTypeDTO>(dbProductType.Entity);
             }
             return null;
         }
