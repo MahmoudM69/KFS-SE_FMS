@@ -46,11 +46,12 @@ namespace Business.Repository.EstablishmentRepositories
 
         public async Task<EstablishmentDTO> GetEstablishment(int id)
         {
-            if (id.ToString() != null)
+            if (id > 0)
             {
                 Establishment establishment = await context.Establishments.Include(x => x.EstablishmentImages).Include(x => x.EstablishmentType)
                                                                           .Include(x => x.Employees).Include(x => x.FinancialAids)
-                                                                          .Include(x => x.Establishment_Products).FirstOrDefaultAsync(x => x.EstablishmentId == id);
+                                                                          .Include(x => x.Establishment_Products)
+                                                                          .FirstOrDefaultAsync(x => x.EstablishmentId == id);
                 if(establishment != null)
                 {
                     return mapper.Map<EstablishmentDTO>(establishment);

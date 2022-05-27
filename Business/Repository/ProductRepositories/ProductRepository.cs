@@ -28,7 +28,7 @@ namespace Business.Repository.ProductRepositories
         }
         public async Task<ProductDTO> CreateProduct(ProductDTO productDTO)
         {
-            if(productDTO != null && productDTO.Establishment_ProductDTOs.Any())
+            if(productDTO != null)
             {
                 Product product = mapper.Map<ProductDTO, Product>(productDTO);
                 var addedProduct = await _db.Products.AddAsync(product);

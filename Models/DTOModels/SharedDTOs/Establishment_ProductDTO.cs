@@ -10,9 +10,9 @@ namespace Models.DTOModels.SharedDTOs
     public class Establishment_ProductDTO
     {
         public int Id { get; set; }
-        public int ProductDTOId { get; set; }
+        public int ProductId { get; set; }
         public virtual ProductDTO ProductDTO { get; set; }
-        public int EstablishmentDTOId { get; set; }
+        public int EstablishmentId { get; set; }
         public virtual EstablishmentDTO EstablishmentDTO { get; set; }
         public virtual ICollection<OrderDTO> OrderDTOs { get; set; }
         public DateTime ProductionDate { get; set; } = DateTime.Now;

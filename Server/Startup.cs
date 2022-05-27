@@ -71,6 +71,7 @@ namespace Server
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IProductTypeRepository, ProductTypeRepository>();
             services.AddScoped<IProductImageRepository, ProductImageRepository>();
+            services.AddScoped<IEstablishment_ProductRepository, Establishment_ProductRepository>();
             services.AddScoped<IFileUploadRepository, FileUploadRepository>();
         }
 

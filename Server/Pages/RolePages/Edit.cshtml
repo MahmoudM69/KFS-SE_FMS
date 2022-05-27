@@ -1,0 +1,79 @@
+﻿@page 
+@model Server.Pages.RolePages.EditModel
+
+@{
+    ViewData["Title"] = "Edit Role";
+}
+<div class="container">
+    <h1>Edit</h1>
+    <hr />
+    <h4>Edit Role '@Model.Role.Name'</h4>
+    <hr />
+    <form method="post" class="mt-3" style="padding: 10px; background-color: whitesmoke; border-radius: 3px; border: 1px solid #797a7b21;">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div style="padding: 20px 10px 1px 10px;background-color: mintcream;border-radius: 2px;margin-left: -10px;margin-right: -10px;margin-top: -9px;border-bottom: 1px solid #e5e5e5;">
+            <div class="form-group row">
+                <label asp-for="@Model.Role.Id" for="@Model.Role.Id" class="col-sm-2 col-form-label">ID:</label>
+                <div class="col-sm-10">
+                    <input type="hidden" asp-for="@Model.Role.Id" id="@Model.Role.Id" class="form-control" name="roleId" />
+                    <input asp-for="@Model.Role.Id" id="@Model.Role.Id" class="form-control" disabled name="roleId" />
+                </div>
+            </div>
+            <div class="form-group row">
+                <label asp-for="@Model.Role.Name" for="@Model.Role.Name" class="col-sm-2 col-form-label">Role Name:</label>
+                <div class="col-sm-10">
+                    <input asp-for="@Model.Role.Name" id="@Model.Role.Name" class="form-control" name="roleName" />
+                </div>
+                <span asp-validation-for="@Model.Role.Name" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group row" style=" padding: inherit; border-radius: 2px; margin-left: -9px; margin-right: -9px; ">
+            <h5>Users List:</h5>
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Users[0].IsChecked)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Users[0].User.UserName)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Users[0].User.Email)
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.Users.Count(); i++)
+                    {
+                        <input type="hidden" asp-for="@Model.Users[i].UserId" />
+                        <input type="hidden" asp-for="@Model.Users[i].User" />
+                        <tr>
+                            <td>
+                                <input asp-for="@Model.Users[i].IsChecked" id="@Model.Users[i].UserId" class="form-check-input" style="position: relative; width: 35px;" />
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => Model.Users[i].User.UserName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => Model.Users[i].User.Email)
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <hr />
+        <div class="form-group">
+            <input type="submit" value="Edit" class="btn btn-primary" style="width:75px;" />
+        </div>
+    </form>
+</div>
+
+<div>
+    <a asp-page="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

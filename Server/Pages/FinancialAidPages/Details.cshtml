@@ -1,0 +1,49 @@
+﻿@page
+@model Server.Pages.FinancialAidPages.DetailsModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>FinancialAid</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.FinancialAid.MinBalance)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.FinancialAid.MinBalance)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.FinancialAid.MaxBalance)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.FinancialAid.MaxBalance)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.FinancialAid.Percentage)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.FinancialAid.Percentage)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.FinancialAid.AidAmount)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.FinancialAid.AidAmount)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.FinancialAid.Establishment)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.FinancialAid.Establishment.EstablishmentAddress)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-page="./Edit" asp-route-id="@Model.FinancialAid.FinancialAidId">Edit</a> |
+    <a asp-page="./Index">Back to List</a>
+</div>
