@@ -3,7 +3,6 @@ using Business.IRepository.IPaymentRepositories;
 using DataAcesss.Data;
 using DataAcesss.Data.PaymentModels;
 using Microsoft.EntityFrameworkCore;
-using Models.DTOModels.PaymentDTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,30 +14,26 @@ namespace Business.Repository.PaymentRepositories
     public class PaymentServiceRepository : IPaymentServiceRepository
     {
         private readonly AppDbContext context;
-        private readonly IMapper mapper;
 
-        public PaymentServiceRepository(AppDbContext context, IMapper mapper)
+        public PaymentServiceRepository(AppDbContext context)
         {
             this.context = context;
-            this.mapper = mapper;
         }
-        public async Task<PaymentServiceDTO> CreatePaymentService(PaymentServiceDTO paymentServiceDTO)
+        public async Task<PaymentService> CreatePaymentService(PaymentService paymentService)
         {
-            if(paymentServiceDTO != null)
+            if(paymentService != null)
             {
-                PaymentService paymentService =  mapper.Map<PaymentService>(paymentServiceDTO);
                 var dbPaymentService = await context.PaymentServices.AddAsync(paymentService);
                 if(dbPaymentService != null)
                 {
                     await context.SaveChangesAsync();
-                    PaymentServiceDTO dbPaymentServiceDTO = mapper.Map<PaymentServiceDTO>(dbPaymentService.Entity);
-                    return dbPaymentServiceDTO;
+                    return (dbPaymentService.Entity);
                 }
             }
             return null;
         }
 
-        public async Task<PaymentServiceDTO> GetPaymentService(int id)
+        public async Task<PaymentService> GetPaymentService(int id)
         {
             if(id.ToString() != null)
             {
@@ -46,37 +41,33 @@ namespace Business.Repository.PaymentRepositories
                                                                              .FirstOrDefaultAsync(x => x.PaymentServiceId == id);
                 if( paymentService != null)
                 {
-                    return mapper.Map<PaymentServiceDTO>(paymentService);
+                    return (paymentService);
                 }
             }
             return null;
         }
 
-        public ICollection<PaymentServiceDTO> GetAllPaymentServices()
+        public List<PaymentService> GetAllPaymentServices()
         {
-            ICollection<PaymentService> paymentServices = context.PaymentServices.ToList();
+            List<PaymentService> paymentServices = context.PaymentServices.ToList();
             if (paymentServices.Any())
             {
-                return mapper.Map<ICollection<PaymentServiceDTO>>(paymentServices);
+                return (paymentServices);
             }
             return null;
         }
 
-        public async Task<PaymentServiceDTO> UpdatePaymentService(int id, PaymentServiceDTO paymentServiceDTO)
+        public async Task<PaymentService> UpdatePaymentService(PaymentService paymentService)
         {
-            if(id.ToString() != null)
+            if(paymentService != null)
             {
-                PaymentService paymentService = await context.PaymentServices.Include(x => x.Payments)
-                                                                             .FirstOrDefaultAsync(x => x.PaymentServiceId == id);
-                if(paymentService != null)
+                if (paymentService.PaymentServiceId > 0 && await context.PaymentServices.FindAsync(paymentService.PaymentServiceId) != null)
                 {
-                    if (paymentServiceDTO.PaymentDTOs == null)
-                        paymentServiceDTO.PaymentDTOs = mapper.Map<ICollection<PaymentDTO>>(paymentService.Payments);
-                    PaymentService updatedPaymentService = context.PaymentServices.Update(mapper.Map<PaymentServiceDTO, PaymentService>(paymentServiceDTO, paymentService)).Entity;
+                    PaymentService updatedPaymentService = context.PaymentServices.Update(paymentService).Entity;
                     if (updatedPaymentService != null)
                     {
                         await context.SaveChangesAsync();
-                        return mapper.Map<PaymentServiceDTO>(updatedPaymentService);
+                        return (updatedPaymentService);
                     }
                 }
             }

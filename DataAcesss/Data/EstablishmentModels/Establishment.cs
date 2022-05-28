@@ -21,10 +21,10 @@ namespace DataAcesss.Data.EstablishmentModels
 
         [ForeignKey("EstablishmentTypeId")]
         public int EstablishmentTypeId { get; set; }
-        public virtual ICollection<EstablishmentImage> EstablishmentImages { get; set; }
+        public virtual List<EstablishmentImage> EstablishmentImages { get; set; }
         public virtual EstablishmentType EstablishmentType { get; set; }
-        public virtual ICollection<Employee> Employees { get; set; }
-        public virtual ICollection<FinancialAid> FinancialAids { get; set; }
-        public virtual ICollection<Establishment_Product> Establishment_Products { get; set; }
+        public virtual List<Employee> Employees { get; set; }
+        public virtual List<FinancialAid> FinancialAids { get; set; }
+        public virtual List<Establishment_Product> Establishment_Products { get; set; }
     }
 }

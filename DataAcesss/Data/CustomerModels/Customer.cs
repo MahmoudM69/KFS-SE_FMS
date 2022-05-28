@@ -9,6 +9,6 @@ namespace DataAcesss.Data.CustomerModels
     {
         [Required]
         public string Address { get; set; }
-        public virtual ICollection<Order> Orders { get; set; }
+        public virtual List<Order> Orders { get; set; }
     }
 }

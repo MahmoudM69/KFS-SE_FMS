@@ -1,4 +1,4 @@
-﻿using Models.DTOModels.OrderDTOs;
+﻿using DataAcesss.Data.OrderModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,11 +9,12 @@ namespace Business.IRepository.IOrderRepositories
 {
     public interface IOrderRepository
     {
-        public Task<OrderDTO> CreateOrder(OrderDTO orderDTO);
-        public Task<OrderDTO> GetOrder(int Id);
-        public Task<ICollection<OrderDTO>> GetAllOrdersAsync();
-        public Task<ICollection<OrderDTO>> GetAllCustomerOrders(string id);
-        public Task<OrderDTO> UpdateOrder(int id, OrderDTO orderDTO);
+        public Task<Order> CreateOrder(Order order);
+        public Task<Order> GetOrder(int Id);
+        public Task<List<Order>> GetAllOrdersAsync();
+        public Task<List<Order>> GetAllCustomerOrders(string id);
+        public Task<List<Order>> GetAllEstablishmentOrders(int id);
+        public Task<Order> UpdateOrder(Order order);
         public void DeleteOrder(int Id);
     }
 }

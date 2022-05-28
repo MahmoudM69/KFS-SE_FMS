@@ -3,10 +3,6 @@ using Business.IRepository.IEstablishmentRepositories;
 using DataAcesss.Data;
 using DataAcesss.Data.EstablishmentModels;
 using Microsoft.EntityFrameworkCore;
-using Models.DTOModels.EmpolyeeDTOs;
-using Models.DTOModels.EstablishmentDTOs;
-using Models.DTOModels.FinancialAidDTOs;
-using Models.DTOModels.SharedDTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,26 +14,23 @@ namespace Business.Repository.EstablishmentRepositories
     public class EstablishmentRepository : IEstablishmentRepository
     {
         private readonly AppDbContext context;
-        private readonly IMapper mapper;
 
-        public EstablishmentRepository(AppDbContext context, IMapper mapper)
+        public EstablishmentRepository(AppDbContext context)
         {
             this.context = context;
-            this.mapper = mapper;
         }
 
-        public async Task<EstablishmentDTO> CreateEstablishment(EstablishmentDTO establishmentDTO)
+        public async Task<Establishment> CreateEstablishment(Establishment establishment)
         {
-            if(establishmentDTO != null)
+            if(establishment != null)
             {
-                if(context.Establishments.FirstOrDefault(x => x.EstablishmentName == establishmentDTO.EstablishmentName) == null)
+                if(context.Establishments.FirstOrDefault(x => x.EstablishmentName == establishment.EstablishmentName) == null)
                 {
-                    Establishment establishment = mapper.Map<Establishment>(establishmentDTO);
                     var dbEstablishment = await context.Establishments.AddAsync(establishment);
-                    if(dbEstablishment != null)
+                    if(dbEstablishment.Entity != null)
                     {
                         await context.SaveChangesAsync();
-                        return mapper.Map<EstablishmentDTO>(dbEstablishment);
+                        return(dbEstablishment.Entity);
                     }
                 }
 
@@ -45,7 +38,7 @@ namespace Business.Repository.EstablishmentRepositories
             return null;
         }
 
-        public async Task<EstablishmentDTO> GetEstablishment(int id)
+        public async Task<Establishment> GetEstablishment(int id)
         {
             if (id > 0)
             {
@@ -53,59 +46,42 @@ namespace Business.Repository.EstablishmentRepositories
                                                                           .Include(x => x.Employees).Include(x => x.FinancialAids)
                                                                           .Include(x => x.Establishment_Products)
                                                                           .FirstOrDefaultAsync(x => x.EstablishmentId == id);
-                EstablishmentDTO establishmentDTO = mapper.Map<EstablishmentDTO>(establishment);
-                if (establishmentDTO != null)
+                if (establishment != null)
                 {
-                    //todo uncomment if value is null
-                    establishmentDTO.Establishment_ProductDTOs ??= mapper.Map<ICollection<Establishment_ProductDTO>>(establishment.Establishment_Products);
-                    establishmentDTO.EmployeeDTOs ??= mapper.Map<ICollection<EmployeeDTO>>(establishment.Employees);
-                    establishmentDTO.EstablishmentImageDTOs ??= mapper.Map<ICollection<EstablishmentImageDTO>>(establishment.EstablishmentImages);
-                    establishmentDTO.EstablishmentTypeDTO ??= mapper.Map<EstablishmentTypeDTO>(establishment.EstablishmentType);
-                    establishmentDTO.FinancialAidDTOs ??= mapper.Map<ICollection<FinancialAidDTO>>(establishment.FinancialAids);
-                    establishmentDTO.EstablishmentImageURLs = new List<string>();
-                    foreach (var url in establishment.EstablishmentImages)
-                    {
-                        establishmentDTO.EstablishmentImageURLs.Add(url.EstablishmentImageUrl);
-                    }
-                    return establishmentDTO;
+                    return establishment;
                 }
             }
             return null;
         }
 
-        public async Task<ICollection<EstablishmentDTO>> GetAllEstablishments()
+        public async Task<List<Establishment>> GetAllEstablishments()
         {
-            ICollection<Establishment> establishments = await context.Establishments.Include(x => x.EstablishmentImages).Include(x => x.EstablishmentType)
+            List<Establishment> establishments = await context.Establishments.Include(x => x.EstablishmentImages).Include(x => x.EstablishmentType)
                                                                                    .Include(x => x.Employees).Include(x => x.FinancialAids)
                                                                                    .Include(x => x.Establishment_Products).ToListAsync();
             if (establishments.Any())
             {
-                return mapper.Map<ICollection<EstablishmentDTO>>(establishments);
+                return(establishments);
             }
             return null;
         }
 
-        public async Task<EstablishmentDTO> UpdateEstablishment(int id, EstablishmentDTO establishmentDTO)
+        public async Task<Establishment> UpdateEstablishment(Establishment inEstablishment)
         {
-            if (id.ToString() != null && establishmentDTO != null)
+            if (inEstablishment != null && inEstablishment.EstablishmentId > 0)
             {
-                Establishment establishment = await context.Establishments.Include(x => x.EstablishmentImages).Include(x => x.EstablishmentType)
-                                                                          .Include(x => x.Employees).Include(x => x.FinancialAids)
-                                                                          .Include(x => x.Establishment_Products).FirstOrDefaultAsync(x => x.EstablishmentId == id);
-
-                if (context.Establishments.Where(x => x.EstablishmentName == establishmentDTO.EstablishmentName && 
-                                                 x.EstablishmentName != establishment.EstablishmentName) == null)
-                {
-                    establishmentDTO.EmployeeDTOs ??= mapper.Map<ICollection<EmployeeDTO>>(establishment.Employees);
-                    establishmentDTO.EstablishmentImageDTOs ??= mapper.Map<ICollection<EstablishmentImageDTO>>(establishment.EstablishmentImages);
-                    establishmentDTO.Establishment_ProductDTOs ??= mapper.Map<ICollection<Establishment_ProductDTO>>(establishment.Establishment_Products);
-                    establishmentDTO.EstablishmentTypeDTO ??= mapper.Map<EstablishmentTypeDTO>(establishment.EstablishmentType);
-                    establishment = mapper.Map<EstablishmentDTO, Establishment>(establishmentDTO, establishment);
-                    Establishment dbEstablishment = context.Establishments.Update(establishment).Entity;
-                    if (dbEstablishment != null)
+                if(await context.Establishments.FindAsync(inEstablishment.EstablishmentId) != null)
+                { 
+                
+                    if (await context.Establishments
+                                     .FirstOrDefaultAsync(x => x.EstablishmentName == inEstablishment.EstablishmentName) == null)
                     {
-                        await context.SaveChangesAsync();
-                        return mapper.Map<EstablishmentDTO>(dbEstablishment);
+                        Establishment dbEstablishment = context.Establishments.Update(inEstablishment).Entity;
+                        if (dbEstablishment != null)
+                        {
+                            await context.SaveChangesAsync();
+                            return(dbEstablishment);
+                        }
                     }
                 }
             }
@@ -120,7 +96,7 @@ namespace Business.Repository.EstablishmentRepositories
                 if(establishment != null)
                 {
                     context.Establishments.Remove(establishment);
-                    await context.SaveChangesAsync();
+                    context.SaveChanges();
                 }
             }
         }

@@ -1,7 +1,7 @@
 ﻿@page "/ProductType/Create"
 @page "/ProductType/Edit/{id:int}"
 @using Business.IRepository.IProductRepositories
-@using Models.DTOModels.ProductDTOs
+@using DataAcesss.Data.ProductModels
 @using System.IO
 @inject NavigationManager NavigationManager
 @inject IProductTypeRepository ProductTypeRepository
@@ -30,18 +30,18 @@
 <hr />
 <div class="row">
     <div class="col-md-12">
-        <EditForm Model="ProductTypeDTO" OnValidSubmit="Submit">
+        <EditForm Model="ProductType" OnValidSubmit="Submit">
             <DataAnnotationsValidator/>
             <ValidationSummary/>
             <div class="form-group">
                 <label>ProductType Name</label>
-                <InputText @bind-Value="ProductTypeDTO.Type" class="form-control"></InputText>
-                <ValidationMessage For="() => ProductTypeDTO.Type"></ValidationMessage>
+                <InputText @bind-Value="ProductType.Type" class="form-control"></InputText>
+                <ValidationMessage For="() => ProductType.Type"></ValidationMessage>
             </div>
             <div class="form-group">
                 <label>ProductType Description</label>
-                <InputTextArea @bind-Value="ProductTypeDTO.Description" class="form-control"></InputTextArea>
-                <ValidationMessage For="() => ProductTypeDTO.Description"></ValidationMessage>
+                <InputTextArea @bind-Value="ProductType.Description" class="form-control"></InputTextArea>
+                <ValidationMessage For="() => ProductType.Description"></ValidationMessage>
             </div>
             <div class="form-group">
                 <button class="btn btn-primary" type="submit">@title</button>
@@ -58,24 +58,24 @@
     public string title { get; set; } = "Create";
     [Parameter]
     public int? id { get; set; }
-    private ProductTypeDTO ProductTypeDTO { get; set; } = new();
+    private ProductType ProductType { get; set; } = new();
     protected override async Task OnInitializedAsync()
     {
         if(id != null)
         {
             title = "Edit";
-            ProductTypeDTO = await ProductTypeRepository.GetProductType(id.Value);
+            ProductType = await ProductTypeRepository.GetProductType(id.Value);
         }
     }
     private async void Submit()
     {
         if (title == "Create")
         {
-            var createdProduct = await ProductTypeRepository.CreateProductType(ProductTypeDTO);
+            var createdProduct = await ProductTypeRepository.CreateProductType(ProductType);
         }
         else
         {
-            var createdProduct = await ProductTypeRepository.UpdateProductType(id.Value, ProductTypeDTO);
+            var createdProduct = await ProductTypeRepository.UpdateProductType(id.Value, ProductType);
         }
     }
 }

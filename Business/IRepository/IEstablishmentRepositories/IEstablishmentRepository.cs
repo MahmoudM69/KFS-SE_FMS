@@ -1,15 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Models.DTOModels.EstablishmentDTOs;
+using DataAcesss.Data.EstablishmentModels;
 
 namespace Business.IRepository.IEstablishmentRepositories
 {
     public interface IEstablishmentRepository
     {
-        public Task<EstablishmentDTO> CreateEstablishment(EstablishmentDTO establishmentDTO);
-        public Task<EstablishmentDTO> GetEstablishment(int id);
-        public Task<ICollection<EstablishmentDTO>> GetAllEstablishments();
-        public Task<EstablishmentDTO> UpdateEstablishment(int id, EstablishmentDTO establishmentDTO);
+        public Task<Establishment> CreateEstablishment(Establishment establishment);
+        public Task<Establishment> GetEstablishment(int id);
+        public Task<List<Establishment>> GetAllEstablishments();
+        public Task<Establishment> UpdateEstablishment(Establishment establishment);
         public void DeleteEstablishment(int id);
     }
 }

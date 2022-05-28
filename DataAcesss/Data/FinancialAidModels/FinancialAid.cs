@@ -23,7 +23,7 @@ namespace DataAcesss.Data.FinancialAidModels
         [Required, ForeignKey("EstablishmentId")]
         public int EstablishmentId { get; set; }
         public virtual Establishment Establishment { get; set; }
-        public virtual ICollection<ProductType_FinancialAid> ProductType_FinancialAids { get; set; }
-        public virtual ICollection<Order> Orders { get; set; }
+        public virtual List<ProductType_FinancialAid> ProductType_FinancialAids { get; set; }
+        public virtual List<Order> Orders { get; set; }
     }
 }

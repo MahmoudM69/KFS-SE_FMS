@@ -3,9 +3,9 @@
 @using Business.IRepository.IEstablishmentRepositories
 @using Business.IRepository.IProductRepositories
 @using Business.IRepository.ISharedRepository
-@using Models.DTOModels.EstablishmentDTOs
-@using Models.DTOModels.ProductDTOs
-@using Models.DTOModels.SharedDTOs
+@using DataAcesss.Data.ProductModels
+@using DataAcesss.Data.EstablishmentModels
+@using DataAcesss.Data.Shared
 @using Server.Pages.Shared
 @inject NavigationManager NavigationManager
 @inject IFileUploadRepository FileUploadRepository
@@ -24,22 +24,30 @@
 
 <div class="row">
     <div class="col-12">
-        @if(productDTOs != null && productDTOs.Any())
+        @if(products != null && products.Any())
         {
             @if(id != null)
             {
                 <div class="card-deck">
-                    @foreach(var estProd in Establishment_ProductDTOs)
+                    @foreach(var estProd in Establishment_Products)
                     {
-                        <Item Imgs="@estProd.ProductDTO.ProductImageURLs" 
-                                Title="@estProd.ProductDTO.ProductName" 
-                                Description="@estProd.ProductDTO.ProductDescription" 
-                                RetailPrice="@estProd.RetailPrice"
-                                Percentage="@estProd.Percentage" 
-                                AidAmount="@estProd.AidAmount" 
-                                ExpirationDate="@estProd.ExpirationDate"
-                                Id="@estProd.ProductDTO.ProductId"
-                                Type="Product">
+                        string image = "";
+                        if(estProd.Product.ProductImages != null)
+                        {
+                            foreach (var productImage in estProd.Product.ProductImages)
+                            {
+                                image = productImage.ProductImageUrl;
+                            }
+                        }
+                        <Item Img="@image"
+                              Title="@estProd.Product.ProductName" 
+                              Description="@estProd.Product.ProductDescription" 
+                              RetailPrice="@estProd.RetailPrice"
+                              Percentage="@estProd.Percentage" 
+                              AidAmount="@estProd.AidAmount" 
+                              ExpirationDate="@estProd.ExpirationDate"
+                              Id="@estProd.Product.ProductId"
+                              Type="Product">
                         </Item>
                     }
                 </div>
@@ -61,9 +69,9 @@
                 </tr>
             </thead>
             <tbody>
-                @if(productDTOs != null)
+                @if(products != null)
                 {
-                    @foreach (var product in productDTOs) {
+                    @foreach (var product in products) {
                         <tr>
                             <td>@product.ProductId</td>
                             <td>@product.ProductName</td>
@@ -91,46 +99,43 @@
 @code {
     [Parameter]
     public int? id { get; set; } = 1;
-
-    public ICollection<ProductDTO> productDTOs { get; set; } = new List<ProductDTO>();
-    public List<Establishment_ProductDTO> Establishment_ProductDTOs { get; set; } = new();
-    //protected override async Task OnParametersSetAsync()
-    //{
-    //    id = 1;
-    //    EstablishmentDTO establishmentDTO = await EstablishmentRepository.GetEstablishment(id.Value);
-    //    foreach(var establishment_ProductDTO in establishmentDTO.Establishment_ProductDTOs)
-    //    {
-    //        Establishment_ProductDTOs.Add(establishment_ProductDTO);
-    //        productDTOs.Add(establishment_ProductDTO.ProductDTO);
-    //    }
-    //}
+    public ICollection<Product> products { get; set; } = new List<Product>();
+    public List<Establishment_Product> Establishment_Products { get; set; } = new();
     protected override async Task OnInitializedAsync()
     {
         id = 1;
         if(id != null)
         {
-            ICollection<Establishment_ProductDTO> establishment_ProductDTOs = await Establishment_ProductRepository.GetEstablishment_ProductProducts(id.Value);
-            EstablishmentDTO establishmentDTO = await EstablishmentRepository.GetEstablishment(id.Value);
-            foreach(var establishment_ProductDTO in establishment_ProductDTOs)
+            Establishment establishment = await EstablishmentRepository.GetEstablishment(id.Value);
+            ICollection<Establishment_Product> establishment_Products = await Establishment_ProductRepository.GetEstablishment_ProductProducts(id.Value);
+            if(establishment_Products != null)
             {
-                Establishment_ProductDTOs.Add(establishment_ProductDTO);
-                productDTOs.Add(establishment_ProductDTO.ProductDTO);
+                foreach(var establishment_Product in establishment_Products)
+                {
+                    Establishment_Products.Add(establishment_Product);
+                    products.Add(establishment_Product.Product);
+                }
+                foreach(var product in products)
+                {
+
+                }
             }
         }
         else
         {
-            productDTOs = await ProductRepository.GetAllProducts();
+            products = await ProductRepository.GetAllProducts();
         }
     }
     private async Task DeleteProduct(int Id)
     {
-        ProductDTO productDTO = await ProductRepository.GetProduct(Id);
-        foreach (var imageUrl in productDTO.ProductImageURLs)
+        Product product = await ProductRepository.GetProduct(Id);
+        foreach (var imageUrl in product.ProductImages)
         {
-            var imageName = imageUrl.Replace($"{NavigationManager.BaseUri}Images/", "");
+            var imageName = imageUrl.ProductImageUrl.Replace($"{NavigationManager.BaseUri}Images/", "");
             FileUploadRepository.DeleteImage("Product",imageName);
         }
         ProductRepository.DeleteProduct(Id);
-        productDTOs = await ProductRepository.GetAllProducts();
+        StateHasChanged();
+        products = await ProductRepository.GetAllProducts();
     }
 }

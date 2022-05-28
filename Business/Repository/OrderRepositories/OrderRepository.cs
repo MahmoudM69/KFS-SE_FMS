@@ -5,7 +5,6 @@ using DataAcesss.Data.CustomerModels;
 using DataAcesss.Data.OrderModels;
 using DataAcesss.Data.Shared;
 using Microsoft.EntityFrameworkCore;
-using Models.DTOModels.OrderDTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,31 +16,27 @@ namespace Business.Repository.OrderRepositories
     public class OrderRepository : IOrderRepository
     {
         private readonly AppDbContext context;
-        private readonly IMapper mapper;
 
-        public OrderRepository(AppDbContext context, IMapper mapper)
+        public OrderRepository(AppDbContext context)
         {
             this.context = context;
-            this.mapper = mapper;
         }
 
-        public async Task<OrderDTO> CreateOrder(OrderDTO orderDTO)
+        public async Task<Order> CreateOrder(Order order)
         {
-            if (orderDTO != null && orderDTO.Establishment_ProductDTO != null && orderDTO.CustomerDTO != null)
+            if (order != null && order.Establishment_Product != null && order.Customer != null)
             {
-                Order order = mapper.Map<Order>(orderDTO);
                 var dbOrder = await context.Orders.AddAsync(order);
                 if (dbOrder.Entity != null)
                 {
                     await context.SaveChangesAsync();
-                    OrderDTO dbOrderDTO = mapper.Map<OrderDTO>(dbOrder.Entity);
-                    return dbOrderDTO;
+                    return (dbOrder.Entity);
                 }
             }
             return null;
         }
 
-        public async Task<OrderDTO> GetOrder(int id)
+        public async Task<Order> GetOrder(int id)
         {
             if (id.ToString() != null)
             {
@@ -53,29 +48,41 @@ namespace Business.Repository.OrderRepositories
                                                   .FirstOrDefaultAsync(x => x.OrderId == id);
                 if (order != null)
                 {
-                    return mapper.Map<OrderDTO>(order);
+                    return(order);
                 }
             }
             return null;
         }
 
-        public async Task<ICollection<OrderDTO>> GetAllCustomerOrders(string id)
+        public async Task<List<Order>> GetAllCustomerOrders(string id)
         {
             if (id.ToString() != null)
             {
                 Customer customer = await context.Customers.Include(x => x.Orders).FirstOrDefaultAsync(x => x.Id == id);
                 if(customer != null && customer.Orders.Any())
                 {
-                    ICollection<Order> orders = customer.Orders;
-                    return mapper.Map<ICollection<OrderDTO>>(orders);
+                    List<Order> orders = customer.Orders;
+                    return(orders);
+                }
+            }
+            return null;
+        }
+        public async Task<List<Order>> GetAllEstablishmentOrders(int id)
+        {
+            if (id.ToString() != null)
+            {
+                Establishment_Product establishment_Product = await context.Establishment_Products.Include(x => x.Orders).FirstOrDefaultAsync(x => x.EstablishmentId == id);
+                if (establishment_Product != null && establishment_Product.Orders.Any())
+                {
+                    return(establishment_Product.Orders.ToList());
                 }
             }
             return null;
         }
 
-        public async Task<ICollection<OrderDTO>> GetAllOrdersAsync()
+        public async Task<List<Order>> GetAllOrdersAsync()
         {
-            ICollection<Order> orders = await context.Orders.Include(x => x.Customer)
+            List<Order> orders = await context.Orders.Include(x => x.Customer)
                                                                           .Include(x => x.Establishment_Product).ThenInclude(y => y.Product)
                                                                           .Include(x => x.Establishment_Product).ThenInclude(y => y.Establishment)
                                                                           .Include(x => x.FinancialAid)
@@ -83,28 +90,22 @@ namespace Business.Repository.OrderRepositories
                                                                           .Include(x => x.Payment).ToListAsync();
             if (orders.Any())
             {
-                return mapper.Map<ICollection<OrderDTO>>(orders);
+                return(orders);
             }
             return null;
         }
 
-        public async Task<OrderDTO> UpdateOrder(int id, OrderDTO orderDTO)
+        public async Task<Order> UpdateOrder(Order order)
         {
-            if(id.ToString() != null && orderDTO != null && orderDTO.CustomerDTO != null && orderDTO.Establishment_ProductDTO != null)
+            if (order != null)
             {
-                Order order = await context.Orders.Include(x => x.Customer)
-                                                  .Include(x => x.Establishment_Product)
-                                                  .Include(x => x.FinancialAid)
-                                                  .Include(x => x.Payment)
-                                                  .FirstOrDefaultAsync(x => x.OrderId == id);
-                if (order != null)
+                if(order.OrderId > 0 && order != null && order.Customer != null && order.Establishment_Product != null)
                 {
-                    order = mapper.Map<OrderDTO, Order>(orderDTO, order);
                     var dbOrder = context.Orders.Update(order);
                     if (dbOrder.Entity != null)
                     {
                         await context.SaveChangesAsync();
-                        return mapper.Map<OrderDTO>(dbOrder.Entity);
+                        return(dbOrder.Entity);
                     }
                 }
             }
@@ -119,7 +120,7 @@ namespace Business.Repository.OrderRepositories
                 if (order != null)
                 {
                     context.Orders.Remove(order);
-                    await context.SaveChangesAsync();
+                    context.SaveChanges();
                 }
             }
         }

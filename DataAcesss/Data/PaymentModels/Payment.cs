@@ -18,7 +18,7 @@ namespace DataAcesss.Data.PaymentModels
         [ForeignKey("PaymentServiceId")]
         public int PaymentServiceId { get; set; }
         public virtual PaymentService PaymentService { get; set; }
-        public virtual ICollection<Order> Orders { get; set; }
+        public virtual List<Order> Orders { get; set; }
 
     }
 }

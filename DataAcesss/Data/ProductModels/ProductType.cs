@@ -11,7 +11,7 @@ namespace DataAcesss.Data.ProductModels
         [Required]
         public string Type { get; set; }
         public string Description { get; set; }
-        public virtual ICollection<Product> Products { get; set; }
-        public virtual ICollection<ProductType_FinancialAid> ProductType_FinancialAids { get; set; }
+        public virtual List<Product> Products { get; set; }
+        public virtual List<ProductType_FinancialAid> ProductType_FinancialAids { get; set; }
     }
 }

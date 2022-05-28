@@ -9,6 +9,6 @@ namespace DataAcesss.Data.EstablishmentModels
         public int EstablishmentTypeId { get; set; }
         [Required]
         public string Type { get; set; }
-        public virtual ICollection<Establishment> Establishments { get; set; }
+        public virtual List<Establishment> Establishments { get; set; }
     }
 }

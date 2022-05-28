@@ -3,7 +3,6 @@ using Business.IRepository.IEstablishmentRepositories;
 using DataAcesss.Data;
 using DataAcesss.Data.EstablishmentModels;
 using Microsoft.EntityFrameworkCore;
-using Models.DTOModels.EstablishmentDTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,32 +14,29 @@ namespace Business.Repository.EstablishmentRepositories
     public class EstablishmentTypeRepository : IEstablishmentTypeRepository
     {
         private readonly AppDbContext context;
-        private readonly IMapper mapper;
 
-        public EstablishmentTypeRepository(AppDbContext context, IMapper mapper)
+        public EstablishmentTypeRepository(AppDbContext context)
         {
             this.context = context;
-            this.mapper = mapper;
         }
-        public async Task<EstablishmentTypeDTO> CreateEstablishmentType(EstablishmentTypeDTO establishmentTypeDTO)
+        public async Task<EstablishmentType> CreateEstablishmentType(EstablishmentType establishmentType)
         {
-            if(establishmentTypeDTO != null)
+            if(establishmentType != null)
             {
-                if(context.EstablishmentTypes.FirstOrDefault(x => x.Type == establishmentTypeDTO.Type) == null)
+                if(await context.EstablishmentTypes.FirstOrDefaultAsync(x => x.Type == establishmentType.Type) == null)
                 {
-                    EstablishmentType establishmentType = mapper.Map<EstablishmentType>(establishmentTypeDTO);
                     var dbEstablishmentType = await context.EstablishmentTypes.AddAsync(establishmentType);
-                    if(dbEstablishmentType != null)
+                    if(dbEstablishmentType.Entity != null)
                     {
                         await context.SaveChangesAsync();
-                        return mapper.Map<EstablishmentTypeDTO>(dbEstablishmentType);
+                        return(dbEstablishmentType.Entity);
                     }
                 }
             }
             return null;
         }
 
-        public async Task<EstablishmentTypeDTO> GetEstablishmentType(int id)
+        public async Task<EstablishmentType> GetEstablishmentType(int id)
         {
             if(id.ToString() != null)
             {
@@ -48,40 +44,52 @@ namespace Business.Repository.EstablishmentRepositories
                                                                                       .FirstOrDefaultAsync(x => x.EstablishmentTypeId == id);
                 if(establishmentType != null)
                 {
-                    return mapper.Map<EstablishmentTypeDTO>(establishmentType);
+                    return(establishmentType);
+                }
+            }
+            return null;
+        }
+     
+        public async Task<List<Establishment>> GetTypeEstablishments(int id)
+        {
+            if(id > 0)
+            {
+                EstablishmentType establishmentTypes = await context.EstablishmentTypes.Include(x => x.Establishments).FirstOrDefaultAsync(x => x.EstablishmentTypeId == id);
+                if(establishmentTypes != null)
+                {
+                    if (establishmentTypes.Establishments.Any())
+                    {
+                        return (establishmentTypes.Establishments);
+                    }
                 }
             }
             return null;
         }
 
-        public async Task<ICollection<EstablishmentTypeDTO>> GetAllEstablishmentsType()
+        public async Task<List<EstablishmentType>> GetAllTypes()
         {
-            ICollection<EstablishmentType> establishmentTypes = await context.EstablishmentTypes.Include(x => x.Establishments).ToListAsync();
+            List<EstablishmentType> establishmentTypes = await context.EstablishmentTypes.Include(x => x.Establishments).ToListAsync();
             if (establishmentTypes.Any())
             {
-                return mapper.Map< ICollection<EstablishmentTypeDTO>>(establishmentTypes);
+                return (establishmentTypes);
             }
             return null;
         }
 
-        public async Task<EstablishmentTypeDTO> UpdateEstablishmentType(int id, EstablishmentTypeDTO establishmentTypeDTO)
+        public async Task<EstablishmentType> UpdateEstablishmentType(EstablishmentType establishmentType)
         {
-            if (id.ToString() != null && establishmentTypeDTO != null)
+            if (establishmentType.EstablishmentTypeId > 0 && establishmentType != null)
             {
-                EstablishmentType establishmentType = await context.EstablishmentTypes.Include(x => x.Establishments)
-                                                                                      .FirstOrDefaultAsync(x => x.EstablishmentTypeId == id);
-                if (establishmentType != null)
+                if(await context.EstablishmentTypes.FirstOrDefaultAsync(x => x.EstablishmentTypeId == establishmentType.EstablishmentTypeId) != null)
                 {
-                    if(context.EstablishmentTypes.Where(x => x.Type == establishmentTypeDTO.Type &&
-                                                     x.Type != establishmentType.Type) == null)
+                    if (context.EstablishmentTypes.Where(x => x.Type == establishmentType.Type &&
+                                                        x.Type != establishmentType.Type) == null)
                     {
-                        establishmentTypeDTO.EstablishmentDTOs ??= mapper.Map<ICollection<EstablishmentDTO>>(establishmentType.Establishments);
-                        establishmentType = mapper.Map<EstablishmentTypeDTO, EstablishmentType>(establishmentTypeDTO, establishmentType);
                         EstablishmentType dbEstablishmentType = context.EstablishmentTypes.Update(establishmentType).Entity;
                         if (dbEstablishmentType != null)
                         {
                             await context.SaveChangesAsync();
-                            return mapper.Map<EstablishmentTypeDTO>(dbEstablishmentType);
+                            return(dbEstablishmentType);
                         }
                     }
                 }
@@ -98,9 +106,10 @@ namespace Business.Repository.EstablishmentRepositories
                 if (establishmentType != null)
                 {
                     context.EstablishmentTypes.Remove(establishmentType);
-                    await context.SaveChangesAsync();
+                    context.SaveChanges();
                 }
             }
         }
+
     }
 }

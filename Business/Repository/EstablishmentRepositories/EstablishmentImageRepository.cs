@@ -3,7 +3,6 @@ using Business.IRepository.IEstablishmentRepositories;
 using DataAcesss.Data;
 using DataAcesss.Data.EstablishmentModels;
 using Microsoft.EntityFrameworkCore;
-using Models.DTOModels.EstablishmentDTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,29 +14,26 @@ namespace Business.Repository.EstablishmentRepositories
     public class EstablishmentImageRepository : IEstablishmentImageRepository
     {
         private readonly AppDbContext context;
-        private readonly IMapper mapper;
 
-        public EstablishmentImageRepository(AppDbContext context, IMapper mapper)
+        public EstablishmentImageRepository(AppDbContext context)
         {
             this.context = context;
-            this.mapper = mapper;
         }
-        public async Task<EstablishmentImageDTO> CreateEstablishment(EstablishmentImageDTO establishmentImageDTO)
+        public async Task<EstablishmentImage> CreateEstablishment(EstablishmentImage establishmentImage)
         {
-            if(establishmentImageDTO != null && establishmentImageDTO.EstablishmentDTO != null)
+            if(establishmentImage != null && establishmentImage.Establishment != null)
             {
-                EstablishmentImage establishmentImage = mapper.Map<EstablishmentImage>(establishmentImageDTO);
                 var dbEstablishmentImage = await context.EstablishmentImages.AddAsync(establishmentImage);
                 if(dbEstablishmentImage != null)
                 {
                     await context.SaveChangesAsync();
-                    return mapper.Map<EstablishmentImageDTO>(dbEstablishmentImage);
+                    return (dbEstablishmentImage.Entity);
                 }
             }
             return null;
         }
 
-        public async Task<EstablishmentImageDTO> GetEstablishment(int id)
+        public async Task<EstablishmentImage> GetEstablishment(int id)
         {
             if(id.ToString() != null)
             {
@@ -45,7 +41,7 @@ namespace Business.Repository.EstablishmentRepositories
                                                                                          .FirstOrDefaultAsync(x => x.EstablishmentImageId == id);
                 if(establishmentImage != null)
                 {
-                    return mapper.Map<EstablishmentImageDTO>(establishmentImage);
+                    return(establishmentImage);
                 }
             }
             return null;
@@ -59,7 +55,7 @@ namespace Business.Repository.EstablishmentRepositories
                 if(establishmentImage != null)
                 {
                     context.EstablishmentImages.Remove(establishmentImage);
-                    await context.SaveChangesAsync();
+                    context.SaveChanges();
                 }
             }
         }

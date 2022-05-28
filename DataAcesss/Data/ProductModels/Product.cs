@@ -18,8 +18,8 @@ namespace DataAcesss.Data.ProductModels
         [ForeignKey("ProductTypeId")]
         public int ProductTypeId { get; set; }
         public virtual ProductType ProductType { get; set; }
-        public virtual ICollection<ProductImage> ProductImages { get; set; }
-        public virtual ICollection<Establishment_Product> Establishment_Products { get; set; }
-        public virtual ICollection<Order> Orders { get; set; }
+        public virtual List<ProductImage> ProductImages { get; set; }
+        public virtual List<Establishment_Product> Establishment_Products { get; set; }
+        public virtual List<Order> Orders { get; set; }
     }
 }

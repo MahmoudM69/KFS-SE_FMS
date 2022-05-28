@@ -16,6 +16,6 @@ namespace DataAcesss.Data.PaymentModels
         [Required]
         public bool Percentage { get; set; }
 
-        public virtual ICollection<Payment> Payments { get; set; }
+        public virtual List<Payment> Payments { get; set; }
     }
 }

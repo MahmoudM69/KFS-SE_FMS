@@ -1,4 +1,4 @@
-﻿using Models.DTOModels.ProductDTOs;
+﻿using DataAcesss.Data.ProductModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +9,10 @@ namespace Business.IRepository.IProductRepositories
 {
     public interface IProductRepository
     {
-        public Task<ProductDTO> CreateProduct(ProductDTO productDTO);
-        public Task<ProductDTO> GetProduct(int productId);
-        public Task<ICollection<ProductDTO>> GetAllProducts();
-        public Task<ProductDTO> UpdateProduct(int productId, ProductDTO productDTO);
+        public Task<Product> CreateProduct(Product product);
+        public Task<Product> GetProduct(int productId);
+        public Task<List<Product>> GetAllProducts();
+        public Task<Product> UpdateProduct(Product product);
         public void DeleteProduct(int productId);
     }
 }

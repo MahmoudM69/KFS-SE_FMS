@@ -1,6 +1,6 @@
 ﻿@page "/ProductType"
 @using Business.IRepository.IProductRepositories
-@using Models.DTOModels.ProductDTOs
+@using DataAcesss.Data.ProductModels
 @inject IProductTypeRepository ProductTypeRepository
 
 <div class="row mt-4">
@@ -23,9 +23,9 @@
                 </tr>
             </thead>
             <tbody>
-                @if (productTypeDTOs != null)
+                @if (productTypes != null)
                 {
-                    @foreach (var productType in productTypeDTOs)
+                    @foreach (var productType in productTypes)
                     {
                         <tr>
                             <td>@productType.ProductTypeId</td>
@@ -52,18 +52,18 @@
 </div>
 
 @code {
-    public ICollection<ProductTypeDTO> productTypeDTOs { get; set; }
+    public ICollection<ProductType> productTypes { get; set; }
     protected override async Task OnInitializedAsync()
     {
-        productTypeDTOs = await ProductTypeRepository.GetAllProductsType();
+        productTypes = await ProductTypeRepository.GetAllProductsType();
     }
     private async Task DeleteProduct(int Id)
     {
-        ProductTypeDTO productTypeDTO = await ProductTypeRepository.GetProductType(Id);
-        if(productTypeDTO != null)
+        ProductType productType = await ProductTypeRepository.GetProductType(Id);
+        if(productType != null)
         {
             ProductTypeRepository.DeleteProductType(Id);
-            productTypeDTOs = await ProductTypeRepository.GetAllProductsType();
+            productTypes = await ProductTypeRepository.GetAllProductsType();
         }
     }
 }

@@ -8,7 +8,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DataAcesss\DataAcesss.csproj" />
-    <ProjectReference Include="..\Models\Models.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="IRepository\IApplicationUserRepositories\CustomerIRepositories\" />

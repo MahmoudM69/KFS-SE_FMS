@@ -3,7 +3,6 @@ using Business.IRepository.IProductRepositories;
 using DataAcesss.Data;
 using DataAcesss.Data.ProductModels;
 using Microsoft.EntityFrameworkCore;
-using Models.DTOModels.ProductDTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,34 +14,31 @@ namespace Business.Repository.ProductRepositories
     public class ProductImageRepository : IProductImageRepository
     {
         private readonly AppDbContext context;
-        private readonly IMapper mapper;
-        public ProductImageRepository(AppDbContext db, IMapper mapper)
+        public ProductImageRepository(AppDbContext db)
         {
-            this.mapper = mapper;
             context = db;
         }
 
-        public async Task<ProductImage> CreateProductImage(ProductImageDTO imageDTO)
+        public async Task<ProductImage> CreateProductImage(ProductImage image)
         {
-            if(imageDTO != null)
+            if(image != null)
             {
-                var image = mapper.Map<ProductImageDTO, ProductImage>(imageDTO);
-                if(image != null)
-                {
-                    var dbImage = await context.ProductImages.AddAsync(image);
-                    await context.SaveChangesAsync();
-                    return dbImage.Entity;
-                }
+                var dbImage = await context.ProductImages.AddAsync(image);
+                await context.SaveChangesAsync();
+                return dbImage.Entity;
             }
             return null;
         }
 
-        public async Task<IEnumerable<ProductImageDTO>> GetProductImages(int productId)
+        public async Task<IEnumerable<ProductImage>> GetProductImages(int productId)
         {
-            if(productId.ToString() != null)
+            if(productId > 0)
             {
-                return mapper.Map<IEnumerable<ProductImage>, IEnumerable<ProductImageDTO>>(
-                    await context.ProductImages.Where(x => x.ProductId == productId).ToListAsync());
+                List<ProductImage> productImages = await context.ProductImages.Where(x => x.ProductId == productId).ToListAsync();
+                if (productImages != null && productImages.Any())
+                {
+                    return productImages;
+                }
             }
             return null;
         }
@@ -82,7 +78,7 @@ namespace Business.Repository.ProductRepositories
                 if(imageList.Any())
                 {
                     context.ProductImages.RemoveRange(imageList);
-                    await context.SaveChangesAsync();
+                    context.SaveChanges();
                 }
             }
         }

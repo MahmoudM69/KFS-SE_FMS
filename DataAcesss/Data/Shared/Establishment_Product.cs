@@ -17,7 +17,7 @@ namespace DataAcesss.Data.Shared
         [ForeignKey("EstablishmentId")]
         public int EstablishmentId { get; set; }
         public virtual Establishment Establishment { get; set; }
-        public virtual ICollection<Order> Orders { get; set; }
+        public virtual List<Order> Orders { get; set; }
         public DateTime ProductionDate { get; set; } = DateTime.Now;
         public DateTime ExpirationDate { get; set; } = DateTime.Now;
         [Required]

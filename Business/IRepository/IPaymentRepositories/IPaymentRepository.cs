@@ -1,4 +1,4 @@
-﻿using Models.DTOModels.PaymentDTOs;
+﻿using DataAcesss.Data.PaymentModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +9,11 @@ namespace Business.IRepository.IPaymentRepositories
 {
     public interface IPaymentRepository
     {
-        public Task<PaymentDTO> CreatePayment(PaymentDTO PaymentDTO);
-        public Task<PaymentDTO> GetPayment(int Id);
-        public Task<ICollection<PaymentDTO>> GetAllPayments();
-        public Task<PaymentDTO> UpdatePayment(int id, PaymentDTO PaymentDTO);
+        public Task<Payment> CreatePayment(Payment Payment);
+        public Task<Payment> GetPayment(int Id);
+        public Task<List<Payment>> GetAllCustomerPayments(string id);
+        public Task<List<Payment>> GetAllPayments();
+        public Task<Payment> UpdatePayment(Payment Payment);
         public void DeletePayment(int Id);
     }
 }
