@@ -46,6 +46,19 @@ namespace Business.Repository.ProductRepositories
                 if (product != null)
                 {
                     ProductDTO productDTO = mapper.Map<ProductDTO>(product);
+                    productDTO.Establishment_ProductDTOs = mapper.Map<ICollection<Establishment_ProductDTO>>(product.Establishment_Products);
+                    productDTO.Establishment_ProductDTOs = mapper.Map<ICollection<Establishment_ProductDTO>>(product.Establishment_Products);
+                    productDTO.OrderDTOs = mapper.Map<ICollection<OrderDTO>>(product.Orders);
+                    productDTO.ProductTypeDTO = mapper.Map<ProductTypeDTO>(product.ProductType);
+                    productDTO.Establishment_ProductDTOs ??= mapper.Map<ICollection<Establishment_ProductDTO>>(product.Establishment_Products);
+                    productDTO.OrderDTOs ??= mapper.Map<ICollection<OrderDTO>>(product.Orders);
+                    productDTO.ProductImageDTOs ??= mapper.Map<ICollection<ProductImageDTO>>(product.ProductImages);
+                    productDTO.ProductImageURLs = new();
+                    foreach (var url in product.ProductImages)
+                    {
+                        productDTO.ProductImageURLs.Add(url.ProductImageUrl);
+                    }
+                    productDTO.ProductTypeDTO ??= mapper.Map<ProductTypeDTO>(product.ProductType);
                     return productDTO;
                 }
             }
@@ -74,6 +87,10 @@ namespace Business.Repository.ProductRepositories
                 productDTO.ProductImageDTOs ??= mapper.Map<ICollection<ProductImageDTO>>(product.ProductImages);
                 productDTO.ProductTypeDTO ??= mapper.Map<ProductTypeDTO>(product.ProductType);
                 product = mapper.Map<ProductDTO, Product>(productDTO, product);
+                product.Establishment_Products ??= mapper.Map<ICollection<Establishment_Product>>(productDTO.Establishment_ProductDTOs);
+                product.Orders ??= mapper.Map<ICollection<Order>>(productDTO.OrderDTOs);
+                product.ProductImages ??= mapper.Map<ICollection<ProductImage>>(productDTO.ProductImageDTOs);
+                product.ProductType ??= mapper.Map<ProductType>(productDTO.ProductTypeDTO);
                 var updatedProduct = _db.Products.Update(product);
                 await _db.SaveChangesAsync();
                 return mapper.Map<Product, ProductDTO>(updatedProduct.Entity);

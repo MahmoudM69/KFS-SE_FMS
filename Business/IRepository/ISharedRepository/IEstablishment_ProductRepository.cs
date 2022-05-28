@@ -12,6 +12,7 @@ namespace Business.IRepository.ISharedRepository
     {
         public Task<Establishment_ProductDTO> CreateEstablishment_Product(Establishment_ProductDTO establishment_ProductDTO);
         public Task<ICollection<ProductDTO>> GetEstablishmentProducts(int id);
+        public Task<ICollection<Establishment_ProductDTO>> GetEstablishment_ProductProducts(int id);
         public Task<Establishment_ProductDTO> UpdateEstablishment_Product(Establishment_ProductDTO establishment_ProductDTO);
         public void DeleteEstablishment_Product();
     }

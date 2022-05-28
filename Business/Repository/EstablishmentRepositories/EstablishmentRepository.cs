@@ -5,6 +5,7 @@ using DataAcesss.Data.EstablishmentModels;
 using Microsoft.EntityFrameworkCore;
 using Models.DTOModels.EmpolyeeDTOs;
 using Models.DTOModels.EstablishmentDTOs;
+using Models.DTOModels.FinancialAidDTOs;
 using Models.DTOModels.SharedDTOs;
 using System;
 using System.Collections.Generic;
@@ -52,9 +53,21 @@ namespace Business.Repository.EstablishmentRepositories
                                                                           .Include(x => x.Employees).Include(x => x.FinancialAids)
                                                                           .Include(x => x.Establishment_Products)
                                                                           .FirstOrDefaultAsync(x => x.EstablishmentId == id);
-                if(establishment != null)
+                EstablishmentDTO establishmentDTO = mapper.Map<EstablishmentDTO>(establishment);
+                if (establishmentDTO != null)
                 {
-                    return mapper.Map<EstablishmentDTO>(establishment);
+                    //todo uncomment if value is null
+                    establishmentDTO.Establishment_ProductDTOs ??= mapper.Map<ICollection<Establishment_ProductDTO>>(establishment.Establishment_Products);
+                    establishmentDTO.EmployeeDTOs ??= mapper.Map<ICollection<EmployeeDTO>>(establishment.Employees);
+                    establishmentDTO.EstablishmentImageDTOs ??= mapper.Map<ICollection<EstablishmentImageDTO>>(establishment.EstablishmentImages);
+                    establishmentDTO.EstablishmentTypeDTO ??= mapper.Map<EstablishmentTypeDTO>(establishment.EstablishmentType);
+                    establishmentDTO.FinancialAidDTOs ??= mapper.Map<ICollection<FinancialAidDTO>>(establishment.FinancialAids);
+                    establishmentDTO.EstablishmentImageURLs = new List<string>();
+                    foreach (var url in establishment.EstablishmentImages)
+                    {
+                        establishmentDTO.EstablishmentImageURLs.Add(url.EstablishmentImageUrl);
+                    }
+                    return establishmentDTO;
                 }
             }
             return null;

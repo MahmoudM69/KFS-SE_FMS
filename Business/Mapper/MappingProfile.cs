@@ -22,7 +22,9 @@ namespace Business.Mapper
     {
         public MappingProfile()
         {
-            CreateMap<Establishment, EstablishmentDTO>().ReverseMap().ForMember(x => x.Employees, y => y.MapFrom(z => z.EmployeeDTOs))
+            CreateMap<Establishment, EstablishmentDTO>()
+                .ReverseMap()
+                .ForMember(x => x.Employees, y => y.MapFrom(z => z.EmployeeDTOs))
                                                                      .ForMember(x => x.EstablishmentType, y => y.MapFrom(z => z.EstablishmentTypeDTO))
                                                                      .ForMember(x => x.EstablishmentImages, y => y.MapFrom(z => z.EstablishmentImageDTOs))
                                                                      .ForMember(x => x.FinancialAids, y => y.MapFrom(z => z.FinancialAidDTOs))

@@ -5,11 +5,13 @@
 @using Business.IRepository.ISharedRepository
 @using Models.DTOModels.EstablishmentDTOs
 @using Models.DTOModels.ProductDTOs
+@using Models.DTOModels.SharedDTOs
 @using Server.Pages.Shared
 @inject NavigationManager NavigationManager
 @inject IFileUploadRepository FileUploadRepository
 @inject IProductRepository ProductRepository
 @inject IEstablishmentRepository EstablishmentRepository
+@inject IEstablishment_ProductRepository Establishment_ProductRepository
 
 <div class="row mt-4">
     <div class="col-8">
@@ -20,7 +22,31 @@
     </div>
 </div>
 
-if()
+<div class="row">
+    <div class="col-12">
+        @if(productDTOs != null && productDTOs.Any())
+        {
+            @if(id != null)
+            {
+                <div class="card-deck">
+                    @foreach(var estProd in Establishment_ProductDTOs)
+                    {
+                        <Item Imgs="@estProd.ProductDTO.ProductImageURLs" 
+                                Title="@estProd.ProductDTO.ProductName" 
+                                Description="@estProd.ProductDTO.ProductDescription" 
+                                RetailPrice="@estProd.RetailPrice"
+                                Percentage="@estProd.Percentage" 
+                                AidAmount="@estProd.AidAmount" 
+                                ExpirationDate="@estProd.ExpirationDate"
+                                Id="@estProd.ProductDTO.ProductId"
+                                Type="Product">
+                        </Item>
+                    }
+                </div>
+            }
+        }
+    </div>
+</div>
 
 
 <div class="row mt-4">
@@ -64,17 +90,31 @@ if()
 
 @code {
     [Parameter]
-    public int? id { get; set; }
+    public int? id { get; set; } = 1;
 
-    public ICollection<ProductDTO> productDTOs { get; set; }
+    public ICollection<ProductDTO> productDTOs { get; set; } = new List<ProductDTO>();
+    public List<Establishment_ProductDTO> Establishment_ProductDTOs { get; set; } = new();
+    //protected override async Task OnParametersSetAsync()
+    //{
+    //    id = 1;
+    //    EstablishmentDTO establishmentDTO = await EstablishmentRepository.GetEstablishment(id.Value);
+    //    foreach(var establishment_ProductDTO in establishmentDTO.Establishment_ProductDTOs)
+    //    {
+    //        Establishment_ProductDTOs.Add(establishment_ProductDTO);
+    //        productDTOs.Add(establishment_ProductDTO.ProductDTO);
+    //    }
+    //}
     protected override async Task OnInitializedAsync()
     {
+        id = 1;
         if(id != null)
         {
+            ICollection<Establishment_ProductDTO> establishment_ProductDTOs = await Establishment_ProductRepository.GetEstablishment_ProductProducts(id.Value);
             EstablishmentDTO establishmentDTO = await EstablishmentRepository.GetEstablishment(id.Value);
-            foreach(var establishment in establishmentDTO.Establishment_ProductDTOs)
+            foreach(var establishment_ProductDTO in establishment_ProductDTOs)
             {
-                productDTOs.Add(establishment.ProductDTO);
+                Establishment_ProductDTOs.Add(establishment_ProductDTO);
+                productDTOs.Add(establishment_ProductDTO.ProductDTO);
             }
         }
         else

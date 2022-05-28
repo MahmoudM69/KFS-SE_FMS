@@ -6,7 +6,9 @@ using DataAcesss.Data;
 using DataAcesss.Data.EstablishmentModels;
 using DataAcesss.Data.ProductModels;
 using DataAcesss.Data.Shared;
+using Microsoft.EntityFrameworkCore;
 using Models.DTOModels.EstablishmentDTOs;
+using Models.DTOModels.OrderDTOs;
 using Models.DTOModels.ProductDTOs;
 using Models.DTOModels.SharedDTOs;
 using System;
@@ -49,6 +51,28 @@ namespace Business.Repository.SharedRepository
                 //    //var addedProduct = await context.Products.AddAsync(mapper.Map<Product>(establishment_ProductDTO.ProductDTO));
 
                 //}
+            }
+            return null;
+        }
+
+        public async Task<ICollection<Establishment_ProductDTO>> GetEstablishment_ProductProducts(int id)
+        {
+            if(id.ToString() != null && id > 0)
+            {
+                List<Establishment_Product> establishment_Products = await context.Establishment_Products.Include(x => x.Establishment)
+                                                                                                               .Include(x => x.Product)
+                                                                                                               .Include(x => x.Orders)
+                                                                                                               .Where(x => x.EstablishmentId == id).ToListAsync();
+                List<Establishment_ProductDTO> establishment_ProductDTOs = mapper.Map<List<Establishment_ProductDTO>>(establishment_Products);
+                for(int i = 0; i < establishment_ProductDTOs.Count(); i++)
+                {
+                    establishment_ProductDTOs[i].ProductDTO = mapper.Map<ProductDTO>(establishment_Products[i].Product);
+                    establishment_ProductDTOs[i].EstablishmentDTO = mapper.Map<EstablishmentDTO>(establishment_Products[i].Establishment);
+                    establishment_ProductDTOs[i].OrderDTOs = mapper.Map<List<OrderDTO>>(establishment_Products[i].Orders);
+                    establishment_ProductDTOs[i].ProductDTO = await productRepository.GetProduct(establishment_ProductDTOs[i].ProductId);
+                    establishment_ProductDTOs[i].EstablishmentDTO = await establishmentRepository.GetEstablishment(establishment_ProductDTOs[i].EstablishmentId);
+                }
+                return establishment_ProductDTOs;
             }
             return null;
         }
