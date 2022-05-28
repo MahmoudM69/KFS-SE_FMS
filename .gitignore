@@ -365,3 +365,4 @@ FodyWeavers.xsd
 /DataAcesss/Migrations
 .vscode
 /Server/wwwroot/Images/Product
+/Server/wwwroot/Images/Shared
