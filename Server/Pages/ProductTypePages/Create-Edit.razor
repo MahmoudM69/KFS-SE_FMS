@@ -5,6 +5,8 @@
 @using System.IO
 @inject NavigationManager NavigationManager
 @inject IProductTypeRepository ProductTypeRepository
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Admin, Manager")]
 <style>
     .room-image{
         display: block;

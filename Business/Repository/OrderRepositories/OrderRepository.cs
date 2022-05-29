@@ -22,18 +22,16 @@ namespace Business.Repository.OrderRepositories
             this.context = context;
         }
 
-        public async Task<Order> CreateOrder(Order order)
+        public void CreateOrder(Order order)
         {
-            if (order != null && order.Establishment_Product != null && order.Customer != null)
+            if (order != null && order.Establishment_ProductId > 0 && order.CustomerId != null)
             {
-                var dbOrder = await context.Orders.AddAsync(order);
-                if (dbOrder.Entity != null)
+                var dbOrder = context.Orders.Add(order);
+                if (dbOrder != null)
                 {
-                    await context.SaveChangesAsync();
-                    return (dbOrder.Entity);
+                    context.SaveChanges();
                 }
             }
-            return null;
         }
 
         public async Task<Order> GetOrder(int id)

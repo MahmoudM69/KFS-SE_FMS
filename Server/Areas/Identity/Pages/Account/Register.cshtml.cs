@@ -5,6 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using DataAcesss.Data;
+using DataAcesss.Data.CustomerModels;
+using DataAcesss.Data.EmployeeModels;
+using DataAcesss.Data.EstablishmentModels;
 using DataAcesss.Data.Shared;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -15,6 +19,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 
+
 namespace Server.Areas.Identity.Pages.Account
 {
     [AllowAnonymous]
@@ -24,17 +29,21 @@ namespace Server.Areas.Identity.Pages.Account
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly AppDbContext context;
 
         public RegisterModel(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
+            RoleManager<IdentityRole> roleManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            AppDbContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            this.context = context;
         }
 
         [BindProperty]
@@ -44,6 +53,7 @@ namespace Server.Areas.Identity.Pages.Account
 
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
+        public List<Establishment> Establishments { get; set; }
         public class InputModel
         {
             [Required]
@@ -61,22 +71,64 @@ namespace Server.Areas.Identity.Pages.Account
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
+            [Required]
+            [Display(Name = "Establishment")]
+            public int EstablishmentId { get; set; }
         }
 
         public async Task OnGetAsync(string returnUrl = null)
         {
+            Establishments = context.Establishments.ToList();
             ReturnUrl = returnUrl;
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
+            Establishments = context.Establishments.ToList();
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = Input.Email, Email = Input.Email };
-                var result = await _userManager.CreateAsync(user, Input.Password);
+                ApplicationUser user = new();
+                IdentityResult result = new();
+                if (_signInManager.IsSignedIn(this.User) && !User.IsInRole("Customer"))
+                {
+                    if (User.IsInRole("Manager"))
+                    {
+                        System.Security.Claims.ClaimsPrincipal currentUser = this.User;
+                        var id = _userManager.GetUserId(User);
+                        var manager = context.Employees.Find(id);
+                        Input.EstablishmentId = manager.EstablishmentId;
+                    
+                        user = new Employee
+                        {
+                            UserName = Input.Email,
+                            Email = Input.Email,
+                            EstablishmentId = Input.EstablishmentId
+                        };
+                        result = await _userManager.CreateAsync(user, Input.Password);
+                        await _userManager.AddToRoleAsync(user, "Employee");
+                    }
+                    else if (User.IsInRole("Manager"))
+                    {
+                        user = new Employee
+                        {
+                            UserName = Input.Email,
+                            Email = Input.Email,
+                            EstablishmentId = Input.EstablishmentId
+                        };
+                        result = await _userManager.CreateAsync(user, Input.Password);
+                        await _userManager.AddToRoleAsync(user, "Manager");
+                    }
+                }
+                else
+                {
+                    user = new Customer { UserName = Input.Email, Email = Input.Email };
+                    result = await _userManager.CreateAsync(user, Input.Password);
+                    await _userManager.AddToRoleAsync(user, "Customer");
+                }
+                
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
@@ -98,7 +150,7 @@ namespace Server.Areas.Identity.Pages.Account
                     }
                     else
                     {
-                        await _signInManager.SignInAsync(user, isPersistent: false);
+                        //await _signInManager.SignInAsync(user, isPersistent: false);
                         return LocalRedirect(returnUrl);
                     }
                 }

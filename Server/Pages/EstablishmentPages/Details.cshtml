@@ -1,6 +1,7 @@
 ﻿@page
 @model Server.Pages.EstablishmentPages.DetailsModel
-
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles ="Admin")]
 @{
     ViewData["Title"] = "Details";
 }

@@ -1,20 +1,30 @@
 ﻿@page "/Product/Create"
 @page "/Product/Edit/{id:int}"
+@using System.IO
+@using Business.IRepository.IApplicationUserRepositories.EmoloyeeIRepositories
 @using Business.IRepository.IEstablishmentRepositories
 @using Business.IRepository.IProductRepositories
 @using Business.IRepository.ISharedRepository
-@using System.IO
+@using DataAcesss.Data.EmployeeModels
 @using DataAcesss.Data.EstablishmentModels
 @using DataAcesss.Data.ProductModels
 @using DataAcesss.Data.Shared
+@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Identity
 @inject NavigationManager NavigationManager
 @inject IProductRepository ProductRepository
 @inject IProductTypeRepository ProductTypeRepository
 @inject IEstablishmentRepository EstablishmentRepository
 @inject IProductImageRepository ProductImageRepository
 @inject IEstablishment_ProductRepository Establishment_ProductRepository
+@inject IEmployeeRepository EmployeeRepository
 @inject IFileUploadRepository FileUploadRepository
 @inject NavigationManager NavigationManager
+@inject UserManager<ApplicationUser> userManager
+@inject SignInManager<ApplicationUser> signInManager
+@inject RoleManager<IdentityRole> roleManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@attribute [Authorize(Roles ="Manager, Employee")]
 <style>
     .product-image{
         display: block;
@@ -71,25 +81,28 @@
                         </InputSelect>
                         <ValidationMessage For="() => product.ProductTypeId"></ValidationMessage>
                     </div>
-                    <div class="form-group">
-                        <label>Establishments</label>
-                        <InputSelect @bind-Value="establishment_Product.EstablishmentId" class="form-control">
-                            @if (establishments != null && establishments.Any())
-                            {
-                                <option value="" disabled selected>Choose Establishment</option>
-                                foreach (var establishment in establishments)
+                    @if(IsAdmin)
+                    {
+                        <div class="form-group">
+                            <label>Establishments</label>
+                            <InputSelect @bind-Value="establishment_Product.EstablishmentId" class="form-control">
+                                @if (establishments != null && establishments.Any())
                                 {
-                                    <option value="@establishment.EstablishmentId">@establishment.EstablishmentName</option>
-                                }
+                                    <option value="" disabled selected>Choose Establishment</option>
+                                    foreach (var establishment in establishments)
+                                    {
+                                        <option value="@establishment.EstablishmentId">@establishment.EstablishmentName</option>
+                                    }
 
-                            }
-                            else
-                            {
-                                <option value="" disabled>No Establishments</option>
-                            }
-                        </InputSelect>
-                        <ValidationMessage For="() => establishment_Product.EstablishmentId"></ValidationMessage>
-                    </div>
+                                }
+                                else
+                                {
+                                    <option value="" disabled>No Establishments</option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="() => establishment_Product.EstablishmentId"></ValidationMessage>
+                        </div>
+                    }
                     <div class="form-group">
                         <label>Product Quantity</label>
                         <InputNumber @bind-Value="establishment_Product.Quantity" class="form-control"></InputNumber>
@@ -147,7 +160,7 @@
                     <div class="form-group">
                         <button class="btn btn-success col-4" type="submit">@title Proudct</button>
                         <button class="btn btn-primary col-4" type="reset">Reset</button>
-                        <NavLink href="Product" class="btn btn-secondary col-4">Back to Index</NavLink>
+                        <NavLink href="ProductList" class="btn btn-secondary col-4">Back to Index</NavLink>
                     </div>
                 </EditForm>
             </div>
@@ -159,16 +172,38 @@
 </div>
 
 @code {
+
     public string title { get; set; } = "Create";
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+    private ApplicationUser CurrUser { get; set; } = new();
+    private bool IsAdmin { get; set; }
+
     [Parameter]
     public int? id { get; set; }
     private Product product { get; set; } = new();
     private List<string> Images { get; set; } = new();
     private Establishment_Product establishment_Product { get; set; } = new();
-    public ICollection<ProductType> productTypes { get; set; }
+    private ICollection<ProductType> productTypes { get; set; }
     private ICollection<Establishment> establishments { get; set; }
     protected override async Task OnInitializedAsync()
     {
+        var authState = await authenticationStateTask;
+        var user = authState.User;
+        CurrUser = await userManager.GetUserAsync(user);
+        Employee employee = new();
+        if(await userManager.IsInRoleAsync(CurrUser, "Manager") || await userManager.IsInRoleAsync(CurrUser, "Employee"))
+        {
+            IsAdmin = false;
+            employee = (Employee)userManager.GetUserAsync(user).Result;
+            establishment_Product.EstablishmentId = employee.EstablishmentId;
+        }
+        else if(await userManager.IsInRoleAsync(CurrUser, "Admin"))
+        {
+            IsAdmin = true;
+            establishments = await EstablishmentRepository.GetAllEstablishments();
+        }
+
         if(product.ProductImages != null)
         {
             foreach(var productImage in product.ProductImages)
@@ -176,12 +211,21 @@
                 Images.Add(productImage.ProductImageUrl);
             }
         }
+
         productTypes = await ProductTypeRepository.GetAllProductsType();
-        establishments = await EstablishmentRepository.GetAllEstablishments();
         if(id != null)
         {
             title = "Edit";
             product = await ProductRepository.GetProduct(id.Value);
+            if(product.ProductImages != null)
+            {
+                foreach(var productImage in product.ProductImages)
+                {
+                    Images.Add(productImage.ProductImageUrl);
+                }
+            }
+            if(employee != null)
+                establishment_Product = product.Establishment_Products.FirstOrDefault(x => x.EstablishmentId == employee.EstablishmentId);
         }
     }
     private async Task UploadImages(InputFileChangeEventArgs e)
@@ -244,15 +288,10 @@
     {
         if (title == "Create")
         {
-            //product.ProductType = productTypes.FirstOrDefault(x => x.ProductTypeId == product.ProductTypeId);
             await UpdateProductImage(product, Images);
             var createdProduct = await ProductRepository.CreateProduct(product);
             establishment_Product.ProductId = createdProduct.ProductId;
             var createdEstablishment_ProductRepository = await Establishment_ProductRepository.CreateEstablishment_Product(establishment_Product);
-            //establishment_Product.Establishment = establishments.FirstOrDefault(x => x.EstablishmentId == establishment_Product.EstablishmentId);
-            //List<Establishment_Product> establishment_Products = new();
-            //establishment_Products.Add(establishment_Product);
-            //product.Establishment_Products = establishment_Products;
         }
         else
         {

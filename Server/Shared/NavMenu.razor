@@ -1,4 +1,13 @@
-﻿<div class="top-row pl-4 navbar navbar-dark">
+﻿@using DataAcesss.Data.Shared
+@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> userManager
+@inject SignInManager<ApplicationUser> signInManager
+@inject RoleManager<IdentityRole> roleManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IHttpContextAccessor httpContextAccessor
+
+<div class="top-row pl-4 navbar navbar-dark">
     <a class="navbar-brand" href="">Server</a>
     <button class="navbar-toggler" @onclick="ToggleNavMenu">
         <span class="navbar-toggler-icon"></span>
@@ -22,10 +31,81 @@
                 <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
             </NavLink>
         </li>
+        <li class="nav-item px-3">
+                <NavLink class="nav-link" href="EstablishmentList">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Establishment Menu
+                </NavLink>
+        </li>
+        @if(role == "Customer")
+        {
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="Order">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Orders
+                </NavLink>
+            </li>    
+        }
+        @if (role == "Admin" || role == "Manager")
+        {
+            <li class="nav-item px-3">
+                    <NavLink class="nav-link" href="FinancialAidPages">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Financial Aid
+                </NavLink>
+            </li>
+            @if (role == "Admin")
+            {
+                <li class="nav-item px-3">
+                        <NavLink class="nav-link" href="Establishment">
+                        <span class="oi oi-list-rich" aria-hidden="true"></span> Establishment
+                    </NavLink>
+                </li>
+                <li class="nav-item px-3">
+                        <NavLink class="nav-link" href="EstablishmentType">
+                        <span class="oi oi-list-rich" aria-hidden="true"></span> Establishment Type
+                    </NavLink>
+                </li>
+                <li class="nav-item px-3">
+                        <NavLink class="nav-link" href="PaymentServicesPages">
+                        <span class="oi oi-list-rich" aria-hidden="true"></span> Payment Service
+                    </NavLink>
+                </li>
+            }
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href="identity/account/register">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span> Register Manager
+                </NavLink>
+            </li>
+        }
     </ul>
 </div>
 
 @code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+    private ApplicationUser CurrUser { get; set; } = new();
+    private string role { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await authenticationStateTask;
+        var user = authState.User;
+        CurrUser = await userManager.GetUserAsync(user);
+        if(CurrUser == null)
+        {
+            role = "";
+        }
+        else if(await userManager.IsInRoleAsync(CurrUser, "Admin"))
+        {
+            role = "Admin";
+        }else if(await userManager.IsInRoleAsync(CurrUser, "Manager"))
+        {
+            role = "Manager";
+        }else if(await userManager.IsInRoleAsync(CurrUser, "Employee"))
+        {
+            role = "Employee";
+        }else if(await userManager.IsInRoleAsync(CurrUser, "Customer"))
+        {
+            role = "Customer";
+        }
+    }
     private bool collapseNavMenu = true;
 
     private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;

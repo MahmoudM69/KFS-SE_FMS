@@ -1,6 +1,7 @@
 ﻿@page
 @model Server.Pages.FinancialAidPages.CreateModel
-
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles ="Admin, Manager")]
 @{
     ViewData["Title"] = "Create";
 }
@@ -14,28 +15,36 @@
         <form method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="FinancialAid.MinBalance" class="control-label"></label>
-                <input asp-for="FinancialAid.MinBalance" class="form-control" />
-                <span asp-validation-for="FinancialAid.MinBalance" class="text-danger"></span>
+                <label asp-for="Input.MinBalance" class="control-label">Minimum Balance</label>
+                <input asp-for="Input.MinBalance" class="form-control" />
+                <span asp-validation-for="Input.MinBalance" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="FinancialAid.MaxBalance" class="control-label"></label>
-                <input asp-for="FinancialAid.MaxBalance" class="form-control" />
-                <span asp-validation-for="FinancialAid.MaxBalance" class="text-danger"></span>
+                <label asp-for="Input.MaxBalance" class="control-label">Maximum Balance</label>
+                <input asp-for="Input.MaxBalance" class="form-control" />
+                <span asp-validation-for="Input.MaxBalance" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.AidAmount" class="control-label">Aid Amount</label>
+                <input asp-for="Input.AidAmount" class="form-control" />
+                <span asp-validation-for="Input.AidAmount" class="text-danger"></span>
             </div>
             <div class="form-group form-check">
                 <label class="form-check-label">
-                    <input class="form-check-input" asp-for="FinancialAid.Percentage" /> @Html.DisplayNameFor(model => model.FinancialAid.Percentage)
+                    <input class="form-check-input" asp-for="Input.Percentage" /> @Html.DisplayNameFor(model => model.Input.Percentage)
                 </label>
             </div>
             <div class="form-group">
-                <label asp-for="FinancialAid.AidAmount" class="control-label"></label>
-                <input asp-for="FinancialAid.AidAmount" class="form-control" />
-                <span asp-validation-for="FinancialAid.AidAmount" class="text-danger"></span>
+                <label asp-for="Input.EstablishmentId" class="control-label">Establishment</label>
+                <select asp-for="Input.EstablishmentId" class ="form-control" asp-items="ViewBag.EstablishmentId">
+                    <option value="" selected disabled>Select Establishment</option>
+                </select>
             </div>
             <div class="form-group">
-                <label asp-for="FinancialAid.EstablishmentId" class="control-label"></label>
-                <select asp-for="FinancialAid.EstablishmentId" class ="form-control" asp-items="ViewBag.EstablishmentId"></select>
+                <label asp-for="Input.ProductTypeId" class="control-label">Product Type</label>
+                <select asp-for="Input.ProductTypeId" class ="form-control" asp-items="ViewBag.ProductTypeId">
+                    <option value="" selected disabled>Select Type</option>
+                </select>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />

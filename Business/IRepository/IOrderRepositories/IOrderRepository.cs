@@ -9,7 +9,7 @@ namespace Business.IRepository.IOrderRepositories
 {
     public interface IOrderRepository
     {
-        public Task<Order> CreateOrder(Order order);
+        public void CreateOrder(Order order);
         public Task<Order> GetOrder(int Id);
         public Task<List<Order>> GetAllOrdersAsync();
         public Task<List<Order>> GetAllCustomerOrders(string id);

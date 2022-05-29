@@ -11,9 +11,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="IRepository\IApplicationUserRepositories\CustomerIRepositories\" />
-    <Folder Include="IRepository\IApplicationUserRepositories\EmoloyeeIRepositories\" />
     <Folder Include="Repository\ApplicationUserRepositories\CustomerRepositories\" />
-    <Folder Include="Repository\ApplicationUserRepositories\EmoloyeeRepositories\" />
-    <Folder Include="Repository\ApplicationUserRepositories\" />
   </ItemGroup>
 </Project>

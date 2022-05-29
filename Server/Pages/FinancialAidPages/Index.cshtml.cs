@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using DataAcesss.Data;
 using DataAcesss.Data.FinancialAidModels;
+using DataAcesss.Data.Shared;
 
 namespace Server.Pages.FinancialAidPages
 {
@@ -19,12 +20,13 @@ namespace Server.Pages.FinancialAidPages
             _context = context;
         }
 
-        public IList<FinancialAid> FinancialAid { get;set; }
+        public IList<ProductType_FinancialAid> ProductType_FinancialAids { get; set; }
 
         public async Task OnGetAsync()
         {
-            FinancialAid = await _context.FinancialAids
-                .Include(f => f.Establishment).ToListAsync();
+            ProductType_FinancialAids = await _context.ProductType_FinancialAids
+                                                      .Include(x => x.FinancialAid).ThenInclude(y => y.Establishment)
+                                                      .Include(x => x.ProductType).ToListAsync();
         }
     }
 }

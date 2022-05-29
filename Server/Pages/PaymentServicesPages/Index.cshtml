@@ -1,0 +1,56 @@
+﻿@page
+@model Server.Pages.PaymentServicesPages.IndexModel
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Admin")]
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-page="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.PaymentService[0].PaymentServiceName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PaymentService[0].PaymentServiceProvider)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PaymentService[0].PaymentServiceFee)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PaymentService[0].Percentage)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.PaymentService) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.PaymentServiceName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PaymentServiceProvider)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PaymentServiceFee)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Percentage)
+            </td>
+            <td>
+                <a asp-page="./Edit" asp-route-id="@item.PaymentServiceId">Edit</a> |
+                <a asp-page="./Details" asp-route-id="@item.PaymentServiceId">Details</a> |
+                <a asp-page="./Delete" asp-route-id="@item.PaymentServiceId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

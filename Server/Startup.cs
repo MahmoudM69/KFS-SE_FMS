@@ -1,9 +1,11 @@
+using Business.IRepository.IApplicationUserRepositories.EmoloyeeIRepositories;
 using Business.IRepository.IEstablishmentRepositories;
 using Business.IRepository.IFinancialAidRepositories;
 using Business.IRepository.IOrderRepositories;
 using Business.IRepository.IPaymentRepositories;
 using Business.IRepository.IProductRepositories;
 using Business.IRepository.ISharedRepository;
+using Business.Repository.ApplicationUserRepositories.EmoloyeeRepositories;
 using Business.Repository.EstablishmentRepositories;
 using Business.Repository.FinancialAidRepositories;
 using Business.Repository.OrderRepositories;
@@ -60,7 +62,6 @@ namespace Server
             services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<ApplicationUser>>();
             services.AddDatabaseDeveloperPageExceptionFilter();
             services.AddSingleton<WeatherForecastService>();
-
             services.AddScoped<IEstablishmentRepository, EstablishmentRepository>();
             services.AddScoped<IEstablishmentTypeRepository, EstablishmentTypeRepository>();
             services.AddScoped<IEstablishmentImageRepository, EstablishmentImageRepository>();
@@ -72,6 +73,7 @@ namespace Server
             services.AddScoped<IProductTypeRepository, ProductTypeRepository>();
             services.AddScoped<IProductImageRepository, ProductImageRepository>();
             services.AddScoped<IEstablishment_ProductRepository, Establishment_ProductRepository>();
+            services.AddScoped<IEmployeeRepository, EmployeeRepository>();
             services.AddScoped<IFileUploadRepository, FileUploadRepository>();
         }
 

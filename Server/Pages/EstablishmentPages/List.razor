@@ -1,0 +1,59 @@
+﻿@page "/EstablishmentList"
+@using Business.IRepository.IApplicationUserRepositories.EmoloyeeIRepositories
+@using Business.IRepository.IEstablishmentRepositories
+@using Business.IRepository.IProductRepositories
+@using Business.IRepository.ISharedRepository
+@using DataAcesss.Data.EmployeeModels
+@using DataAcesss.Data.ProductModels
+@using DataAcesss.Data.EstablishmentModels
+@using DataAcesss.Data.Shared
+@using Microsoft.AspNetCore.Identity
+@using Server.Pages.Shared
+@inject NavigationManager NavigationManager
+@inject IFileUploadRepository FileUploadRepository
+@inject IProductRepository ProductRepository
+@inject IEstablishmentRepository EstablishmentRepository
+@inject IEstablishment_ProductRepository Establishment_ProductRepository
+@inject IEmployeeRepository EmployeeRepository
+
+<div class="row mt-4">
+    <div class="col-8">
+        <h4 class="card-title text-info">Establishment</h4>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        @if(Establishments != null && Establishments.Any())
+        {
+            <div class="card-deck">
+                @foreach(var establishment in Establishments)
+                {
+                    string image = "";
+                    if(establishment.EstablishmentImages != null)
+                    {
+                        foreach (var establishmentImage in establishment.EstablishmentImages)
+                        {
+                            image = establishmentImage.EstablishmentImageUrl;
+                        }
+                    }
+                    <Item Img="@image"
+                            Title="@establishment.EstablishmentName" 
+                            Description="@establishment.EstablishmentDescription"
+                            Id="@establishment.EstablishmentId"
+                            Type="Establishment">
+                    </Item>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+
+
+@code {
+    public List<Establishment> Establishments { get; set; } = new();
+    protected override async Task OnInitializedAsync()
+    {
+        Establishments = await EstablishmentRepository.GetAllEstablishments();
+    }
+}

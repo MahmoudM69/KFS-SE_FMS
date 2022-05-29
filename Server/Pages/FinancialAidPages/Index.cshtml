@@ -1,6 +1,7 @@
-﻿@page "/FinancialAid"
+﻿@page
 @model Server.Pages.FinancialAidPages.IndexModel
-
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles ="Admin, Manager")]
 @{
     ViewData["Title"] = "Index";
 }
@@ -14,40 +15,46 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.FinancialAid[0].MinBalance)
+                @Html.DisplayNameFor(model => model.ProductType_FinancialAids[0].FinancialAid.MinBalance)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.FinancialAid[0].MaxBalance)
+                @Html.DisplayNameFor(model => model.ProductType_FinancialAids[0].FinancialAid.MaxBalance)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.FinancialAid[0].Percentage)
+                @Html.DisplayNameFor(model => model.ProductType_FinancialAids[0].FinancialAid.Percentage)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.FinancialAid[0].AidAmount)
+                @Html.DisplayNameFor(model => model.ProductType_FinancialAids[0].FinancialAid.AidAmount)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.FinancialAid[0].Establishment)
+                @Html.DisplayNameFor(model => model.ProductType_FinancialAids[0].FinancialAid.Establishment)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ProductType_FinancialAids[0].ProductType)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model.FinancialAid) {
+@foreach (var item in Model.ProductType_FinancialAids) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.MinBalance)
+                @Html.DisplayFor(modelItem => item.FinancialAid.MinBalance)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.MaxBalance)
+                @Html.DisplayFor(modelItem => item.FinancialAid.MaxBalance)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Percentage)
+                @Html.DisplayFor(modelItem => item.FinancialAid.Percentage)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.AidAmount)
+                @Html.DisplayFor(modelItem => item.FinancialAid.AidAmount)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Establishment.EstablishmentAddress)
+                @Html.DisplayFor(modelItem => item.FinancialAid.Establishment.EstablishmentName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProductType.Type)
             </td>
             <td>
                 <a asp-page="./Edit" asp-route-id="@item.FinancialAidId">Edit</a> |

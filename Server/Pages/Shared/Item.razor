@@ -1,4 +1,11 @@
-﻿<style>
+﻿@using DataAcesss.Data.Shared
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<ApplicationUser> userManager
+@inject SignInManager<ApplicationUser> signInManager
+@inject RoleManager<IdentityRole> roleManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<style>
     .product-image{
         display: block;
         width: 100%;
@@ -50,15 +57,21 @@
     <div class="card-body">
         <h5 class="card-title">@Title</h5>
         <p class="card-text">@Description</p>
+        @if(Type == "Establishment")
+        {
+            <a href="/ProductList/@Id" class="btn btn-primary col">View</a>
+        }
         @if(ExpirationDate != null)
         {
             <p>@Price.ToString("c")</p>
-            <a href="#" class="btn btn-primary col">Order</a>
+            <button @onclick="@(() => Order.InvokeAsync(Id))" class="btn btn-primary col">Order</button>
         }
     </div>
 </div>
 
 @code {
+    [Parameter]
+    public EventCallback<int> Order { get; set; }
     [Parameter]
     public int Id { get; set; }
     [Parameter]
@@ -110,4 +123,5 @@
         }
         return base.OnParametersSetAsync();
     }
+    
 }

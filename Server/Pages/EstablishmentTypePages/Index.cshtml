@@ -1,6 +1,7 @@
 ﻿@page "/EstablishmentType"
 @model Server.Pages.EstablishmentTypePages.IndexModel
-
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles ="Admin")]
 @{
     ViewData["Title"] = "Index";
 }
