@@ -11,7 +11,6 @@
 @using DataAcesss.Data.Shared
 @using Microsoft.AspNetCore.Http
 @using Microsoft.AspNetCore.Identity
-@using System.ComponentModel.DataAnnotations
 @inject NavigationManager NavigationManager
 @inject IProductRepository ProductRepository
 @inject IProductTypeRepository ProductTypeRepository
@@ -50,22 +49,22 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-body">
-                <EditForm Model="inputModel" OnValidSubmit="Submit">
+                <EditForm Model="product" OnValidSubmit="Submit">
                     <DataAnnotationsValidator/>
                     <ValidationSummary/>
                     <div class="form-group">
                         <label>Product Name</label>
-                        <InputText @bind-Value="inputModel.ProductName" class="form-control" reqired></InputText>
-                        <ValidationMessage For="() => inputModel.ProductName"></ValidationMessage>
+                        <InputText @bind-Value="product.ProductName" class="form-control" reqired></InputText>
+                        <ValidationMessage For="() => product.ProductName"></ValidationMessage>
                     </div>
                     <div class="form-group">
                         <label>Product Description</label>
-                        <InputTextArea @bind-Value="inputModel.ProductDescription" class="form-control" reqired></InputTextArea>
-                        <ValidationMessage For="() => inputModel.ProductDescription"></ValidationMessage>
+                        <InputTextArea @bind-Value="product.ProductDescription" class="form-control" reqired></InputTextArea>
+                        <ValidationMessage For="() => product.ProductDescription"></ValidationMessage>
                     </div>
                     <div class="form-group">
                         <label>Product Types</label>
-                        <InputSelect @bind-Value="inputModel.ProductTypeId" class="form-control" reqired>
+                        <InputSelect @bind-Value="product.ProductTypeId" class="form-control" reqired>
                             @if (productTypes != null && productTypes.Any())
                             {
                                 <option value="" disabled selected>Choose Type</option>
@@ -80,13 +79,13 @@
                                 <option value="" disabled>No Product Type</option>
                             }
                         </InputSelect>
-                        <ValidationMessage For="() => inputModel.ProductTypeId"></ValidationMessage>
+                        <ValidationMessage For="() => product.ProductTypeId"></ValidationMessage>
                     </div>
                     @if(IsAdmin)
                     {
                         <div class="form-group">
                             <label>Establishments</label>
-                            <InputSelect @bind-Value="inputModel.EstablishmentId" class="form-control" reqired>
+                            <InputSelect @bind-Value="establishment_Product.EstablishmentId" class="form-control" reqired>
                                 @if (establishments != null && establishments.Any())
                                 {
                                     <option value="" disabled selected>Choose Establishment</option>
@@ -101,42 +100,42 @@
                                     <option value="" disabled>No Establishments</option>
                                 }
                             </InputSelect>
-                            <ValidationMessage For="() => inputModel.EstablishmentId"></ValidationMessage>
+                            <ValidationMessage For="() => establishment_Product.EstablishmentId"></ValidationMessage>
                         </div>
                     }
                     <div class="form-group">
                         <label>Product Quantity</label>
-                        <InputNumber @bind-Value="inputModel.Quantity" class="form-control" reqired></InputNumber>
-                        <ValidationMessage For="() => inputModel.Quantity"></ValidationMessage>
+                        <InputNumber @bind-Value="establishment_Product.Quantity" class="form-control" reqired></InputNumber>
+                        <ValidationMessage For="() => establishment_Product.Quantity"></ValidationMessage>
                     </div>
                     <div class="form-group">
                         <label>Purchase Price</label>
-                        <InputNumber @bind-Value="inputModel.PurchasePrice" class="form-control" reqired></InputNumber>
-                        <ValidationMessage For="() => inputModel.PurchasePrice"></ValidationMessage>
+                        <InputNumber @bind-Value="establishment_Product.PurchasePrice" class="form-control" reqired></InputNumber>
+                        <ValidationMessage For="() => establishment_Product.PurchasePrice"></ValidationMessage>
                     </div>
                     <div class="form-group">
                         <label>Retail Price</label>
-                        <InputNumber @bind-Value="inputModel.RetailPrice" class="form-control" reqired></InputNumber>
-                        <ValidationMessage For="() => inputModel.RetailPrice"></ValidationMessage>
+                        <InputNumber @bind-Value="establishment_Product.RetailPrice" class="form-control" reqired></InputNumber>
+                        <ValidationMessage For="() => establishment_Product.RetailPrice"></ValidationMessage>
                     </div>
                     <div class="form-group">
                         <label>Aid Amount in %</label>
                         
                         <div class="row col-12">
-                            <InputNumber @bind-Value="inputModel.AidAmount" class="form-control col-11" reqired></InputNumber>
-                            <InputCheckbox @bind-Value="inputModel.Percentage" class="form-control col-1"></InputCheckbox>
+                            <InputNumber @bind-Value="establishment_Product.AidAmount" class="form-control col-11" reqired></InputNumber>
+                            <InputCheckbox @bind-Value="establishment_Product.Percentage" class="form-control col-1"></InputCheckbox>
                         </div>
-                        <ValidationMessage For="() => inputModel.AidAmount"></ValidationMessage>
+                        <ValidationMessage For="() => establishment_Product.AidAmount"></ValidationMessage>
                     </div>
                     <div class="form-group">
                         <label>Production Date</label>
-                        <InputDate @bind-Value="inputModel.ProductionDate" class="form-control" reqired></InputDate>
-                        <ValidationMessage For="() => inputModel.ProductionDate"></ValidationMessage>
+                        <InputDate @bind-Value="establishment_Product.ProductionDate" class="form-control" reqired></InputDate>
+                        <ValidationMessage For="() => establishment_Product.ProductionDate"></ValidationMessage>
                     </div>
                     <div class="form-group">
                         <label>Expiration Date</label>
-                        <InputDate @bind-Value="inputModel.ExpirationDate" class="form-control" reqired></InputDate>
-                        <ValidationMessage For="() => inputModel.ExpirationDate"></ValidationMessage>
+                        <InputDate @bind-Value="establishment_Product.ExpirationDate" class="form-control" reqired></InputDate>
+                        <ValidationMessage For="() => establishment_Product.ExpirationDate"></ValidationMessage>
                     </div>
                     <div class="form-group">
                         <label>Product Images</label>
@@ -170,38 +169,14 @@
 </div>
 
 @code {
-    public class InputModel
-    {
-        public int ProductId { get; set; }
-        [Required]
-        public string ProductName { get; set; }
-        public string ProductDescription { get; set; }
-        [Required, Range(1,double.MaxValue,ErrorMessage = "Please choose a type")]
-        public int ProductTypeId { get; set; }
-        [Required, Range(1,double.MaxValue,ErrorMessage = "Please choose an establishment")]
-        public int EstablishmentId { get; set; }
-        [Required, Range(0,double.MaxValue,ErrorMessage = "This field must be a positive number")]
-        public float Quantity { get; set; }
-        [Required, Range(0,double.MaxValue,ErrorMessage = "This field must be a positive number")]
-        public decimal PurchasePrice { get; set; }
-        [Required, Range(0,double.MaxValue,ErrorMessage = "This field must be a positive number")]
-        public decimal RetailPrice { get; set; }
-        [Required]
-        public bool Percentage { get; set; }
-        [Required, Range(0,double.MaxValue,ErrorMessage = "This field must be a positive number")]
-        public decimal AidAmount { get; set; }
-        [Required, DataType(DataType.Date)]
-        public DateTime ProductionDate { get; set; }
-        [Required ,DataType(DataType.Date)]
-        public DateTime ExpirationDate { get; set; }
-    }
 
     public string title { get; set; } = "Create";
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
     private bool IsAdmin { get; set; }
 
     [Parameter]
     public int? id { get; set; }
-    private InputModel inputModel { get; set; } = new();
     private Product product { get; set; } = new();
     private List<string> Images { get; set; } = new();
     private Establishment_Product establishment_Product { get; set; } = new();
@@ -209,21 +184,20 @@
     private ICollection<Establishment> establishments { get; set; }
     protected override async Task OnInitializedAsync()
     {
+        var authState = await authenticationStateTask;
         var user = AuthenticationStateProvider.GetAuthenticationStateAsync().Result.User;
         Employee employee = new();
         if(user.IsInRole("Manager") || user.IsInRole("Employee"))
         {
             IsAdmin = false;
             employee = (Employee)userManager.GetUserAsync(user).Result;
-            inputModel.EstablishmentId = employee.EstablishmentId;
+            establishment_Product.EstablishmentId = employee.EstablishmentId;
         }
         else if(user.IsInRole("Admin"))
         {
             IsAdmin = true;
             establishments = EstablishmentRepository.GetAllEstablishments();
         }
-
-        productTypes = await ProductTypeRepository.GetAllProductsType();
 
         if(product.ProductImages != null)
         {
@@ -233,6 +207,7 @@
             }
         }
 
+        productTypes = await ProductTypeRepository.GetAllProductsType();
         if(id != null)
         {
             title = "Edit";
@@ -246,21 +221,6 @@
             }
             if(employee != null)
                 establishment_Product = product.Establishment_Products.FirstOrDefault(x => x.EstablishmentId == employee.EstablishmentId);
-            inputModel = new()
-            {
-                ProductId = product.ProductId,
-                ProductName = product.ProductName,
-                ProductDescription = product.ProductDescription,
-                ProductTypeId = product.ProductTypeId,
-                EstablishmentId = establishment_Product.EstablishmentId,
-                PurchasePrice = establishment_Product.PurchasePrice,
-                RetailPrice = establishment_Product.RetailPrice,
-                Quantity = establishment_Product.Quantity,
-                AidAmount = establishment_Product.AidAmount,
-                Percentage = establishment_Product.Percentage,
-                ProductionDate = establishment_Product.ProductionDate,
-                ExpirationDate = establishment_Product.ExpirationDate
-            };
         }
     }
     private async Task UploadImages(InputFileChangeEventArgs e)
@@ -321,29 +281,10 @@
     }
     private async Task Submit()
     {
-        product = new()
-        {
-            ProductId = inputModel.ProductId,
-            ProductName = inputModel.ProductName,
-            ProductDescription = inputModel.ProductDescription,
-            ProductTypeId = inputModel.ProductTypeId
-        };
-        establishment_Product = new()
-        {
-            EstablishmentId = inputModel.EstablishmentId,
-            ProductId = inputModel.ProductId,
-            Quantity = inputModel.Quantity,
-            PurchasePrice = inputModel.PurchasePrice,
-            RetailPrice = inputModel.RetailPrice,
-            AidAmount = inputModel.AidAmount,
-            Percentage = inputModel.Percentage,
-            ProductionDate = inputModel.ProductionDate,
-            ExpirationDate = inputModel.ExpirationDate
-        };
         if (title == "Create")
         {
-            var createdProduct = await ProductRepository.CreateProduct(product);
             await UpdateProductImage(product, Images);
+            var createdProduct = await ProductRepository.CreateProduct(product);
             establishment_Product.ProductId = createdProduct.ProductId;
             var createdEstablishment_ProductRepository = await Establishment_ProductRepository.CreateEstablishment_Product(establishment_Product);
         }
