@@ -40,9 +40,9 @@ namespace Business.Repository.PaymentRepositories
             if (id.ToString() != null)
             {
                 Payment payment = await context.Payments.Include(x => x.PaymentService)
-                                                        .Include(x => x.Orders).ThenInclude(y => y.Customer)
-                                                        .Include(x => x.Orders).ThenInclude(y => y.establishment_Product)
-                                                        .Include(x => x.Orders).ThenInclude(y => y.FinancialAid)
+                                                        .Include(x => x.Order).ThenInclude(y => y.Customer)
+                                                        .Include(x => x.Order).ThenInclude(y => y.Establishment_Product)
+                                                        .Include(x => x.Order).ThenInclude(y => y.FinancialAid)
                                                         .FirstOrDefaultAsync(x => x.PaymentId == id);
                 if (payment != null)
                 {
@@ -54,7 +54,7 @@ namespace Business.Repository.PaymentRepositories
 
         public async Task<List<Payment>> GetAllCustomerPayments(string id)
         {
-            Customer customer = await context.Customers.Include(x => x.Orders).ThenInclude(y => y.establishment_Product)
+            Customer customer = await context.Customers.Include(x => x.Orders).ThenInclude(y => y.Establishment_Product)
                                                             .Include(x => x.Orders).ThenInclude(y => y.FinancialAid)
                                                             .FirstOrDefaultAsync(x => x.Id == id);
             if (customer.Orders.Any())
@@ -72,9 +72,9 @@ namespace Business.Repository.PaymentRepositories
         public async Task<List<Payment>> GetAllPayments()
         {
             List<Payment> payments = await context.Payments.Include(x => x.PaymentService)
-                                                            .Include(x => x.Orders).ThenInclude(y => y.Customer)
-                                                            .Include(x => x.Orders).ThenInclude(y => y.establishment_Product)
-                                                            .Include(x => x.Orders).ThenInclude(y => y.FinancialAid)
+                                                            .Include(x => x.Order).ThenInclude(y => y.Customer)
+                                                            .Include(x => x.Order).ThenInclude(y => y.Establishment_Product)
+                                                            .Include(x => x.Order).ThenInclude(y => y.FinancialAid)
                                                             .ToListAsync();
             if (payments.Any())
             {

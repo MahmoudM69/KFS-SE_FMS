@@ -45,10 +45,10 @@ namespace Business.Mapper
             CreateMap<Order, Order>().ReverseMap().ForMember(x => x.Customer, y => y.MapFrom(z => z.Customer))
                                                      .ForMember(x => x.FinancialAid, y => y.MapFrom(z => z.FinancialAid))
                                                      .ForMember(x => x.Payment, y => y.MapFrom(z => z.Payment))
-                                                     .ForMember(x => x.establishment_Product, y => y.MapFrom(z => z.establishment_Product));
+                                                     .ForMember(x => x.Establishment_Product, y => y.MapFrom(z => z.Establishment_Product));
 
             CreateMap<Payment, Payment>().ReverseMap().ForMember(x => x.PaymentService, y => y.MapFrom(z => z.PaymentService))
-                                                         .ForMember(x => x.Orders, y => y.MapFrom(z => z.Orders));
+                                                         .ForMember(x => x.Order, y => y.MapFrom(z => z.Order));
 
             CreateMap<PaymentService, PaymentService>().ReverseMap().ForMember(x => x.Payments, y => y.MapFrom(z => z.Payments));
 

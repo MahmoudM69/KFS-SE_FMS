@@ -17,44 +17,30 @@ namespace Business.Repository.SharedRepository
         }
         public async Task<string> UploadImage(string folder, IBrowserFile file)
         {
-            try
+            FileInfo fileInfo = new(file.Name);
+            var fileName = Path.GetFileNameWithoutExtension(file.Name) + Guid.NewGuid().ToString() + fileInfo.Extension;
+            var folderDir = $"{hostEnvironment.WebRootPath}\\Images\\{folder}";
+            var path = Path.Combine(hostEnvironment.WebRootPath, "Images", folder, fileName);
+            MemoryStream memoryStream = new();
+            await file.OpenReadStream().CopyToAsync(memoryStream);
+            if (!Directory.Exists(folderDir))
             {
-                FileInfo fileInfo = new FileInfo(file.Name);
-                var fileName = Path.GetFileNameWithoutExtension(file.Name) + Guid.NewGuid().ToString() + fileInfo.Extension;
-                var folderDir = $"{hostEnvironment.WebRootPath}\\Images\\{folder}";
-                var path = Path.Combine(hostEnvironment.WebRootPath, "Images", folder, fileName);
-                MemoryStream memoryStream = new MemoryStream();
-                await file.OpenReadStream().CopyToAsync(memoryStream);
-                if (!Directory.Exists(folderDir))
-                {
-                    Directory.CreateDirectory(folderDir);
-                }
-                await using (var fs = new FileStream(path, FileMode.Create, FileAccess.Write))
-                {
-                    memoryStream.WriteTo(fs);
-                }
-                var url = $"Images/{folder}/{fileName}";
-                return url;
+                Directory.CreateDirectory(folderDir);
             }
-            catch(Exception ex)
+            await using (var fs = new FileStream(path, FileMode.Create, FileAccess.Write))
             {
-                throw;
+                memoryStream.WriteTo(fs);
             }
+            var url = $"Images/{folder}/{fileName}";
+            return url;
         }
 
         public void DeleteImage(string folder, string file)
         {
-            try
+            var path = $"{hostEnvironment.WebRootPath}\\Images\\{folder}\\{file}";
+            if(File.Exists(path))
             {
-                var path = $"{hostEnvironment.WebRootPath}\\Images\\{folder}\\{file}";
-                if(File.Exists(path))
-                {
-                    File.Delete(path);
-                }
-            }
-            catch(Exception ex)
-            {
-                throw;
+                File.Delete(path);
             }
         }
     }

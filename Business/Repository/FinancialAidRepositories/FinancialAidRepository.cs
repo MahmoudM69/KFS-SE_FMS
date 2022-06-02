@@ -77,15 +77,14 @@ namespace Business.Repository.FinancialAidRepositories
             return null;
         }
 
-        public List<FinancialAid> GetProductTypeFinancialAids(int id)
+        public async Task<List<FinancialAid>> GetProductTypeFinancialAids(int id)
         {
             if (id > 0)
             {
-                List<FinancialAid> financialAids = context.FinancialAids.Include(x => x.ProductType_FinancialAids).ThenInclude(y => y.ProductType)
-                                                                        .Include(x => x.Establishment)
-                                                                        .Include(x => x.Orders).Where(x => x
-                                                                        .ProductType_FinancialAids.FirstOrDefault(y => y.ProductTypeId == id)
-                                                                        .ProductTypeId == id).ToList();
+                List<FinancialAid> financialAids = await context.FinancialAids.Include(x => x.ProductType_FinancialAids).ThenInclude(y => y.ProductType)
+                                                                             .Include(x => x.Establishment)
+                                                                             .Include(x => x.Orders).Where(x => x.ProductType_FinancialAids
+                                                                             .FirstOrDefault(y => y.ProductTypeId == id).ProductTypeId == id).ToListAsync();
                 if (financialAids.Any())
                 {
                     return financialAids;

@@ -47,9 +47,9 @@ namespace Business.Repository.PaymentRepositories
             return null;
         }
 
-        public List<PaymentService> GetAllPaymentServices()
+        public async Task<List<PaymentService>> GetAllPaymentServices()
         {
-            List<PaymentService> paymentServices = context.PaymentServices.ToList();
+            List<PaymentService> paymentServices = await context.PaymentServices.ToListAsync();
             if (paymentServices.Any())
             {
                 return (paymentServices);

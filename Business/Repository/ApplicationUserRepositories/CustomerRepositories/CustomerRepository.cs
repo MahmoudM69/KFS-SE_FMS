@@ -18,7 +18,7 @@ namespace Business.Repository.ApplicationUserRepositories.CustomerRepositories
         {
             this.context = context;
         }
-        public Customer GetemployeeById(string id)
+        public Customer GetCustomerById(string id)
         {
             if(id != null) 
             {
@@ -27,7 +27,7 @@ namespace Business.Repository.ApplicationUserRepositories.CustomerRepositories
             return null;
         }
 
-        public Customer GetemployeeByName(string Name)
+        public Customer GetCustomerByName(string Name)
         {
             if (Name != null)
             {

@@ -190,10 +190,11 @@ else
             Stats = "pending",
             CustomerId = User.Id,
             Quantity = 0,
-            Establishment_ProductId = Establishment_Products.FirstOrDefault(x => x.ProductId == Id).Id
+            Establishment_Product = Establishment_Products.FirstOrDefault(x => x.ProductId == Id),
         };
-        order.Total = Establishment_Products.FirstOrDefault(x => x.ProductId == Id).CalcTotal();
+        order.Establishment_ProductId = order.Establishment_Product.Id;
+        order.Total = order.Establishment_Product.CalcTotal();
         OrderRepository.CreateOrder(order);
-        NavigationManager.NavigateTo("/Orders");
+        NavigationManager.NavigateTo("/Orders",true);
     }
 }

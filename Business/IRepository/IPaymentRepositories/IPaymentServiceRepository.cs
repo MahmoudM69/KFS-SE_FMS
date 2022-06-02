@@ -11,7 +11,7 @@ namespace Business.IRepository.IPaymentRepositories
     {
         public Task<PaymentService> CreatePaymentService(PaymentService paymentService);
         public Task<PaymentService> GetPaymentService(int Id);
-        public List<PaymentService> GetAllPaymentServices();
+        public Task<List<PaymentService>> GetAllPaymentServices();
         public Task<PaymentService> UpdatePaymentService(PaymentService paymentService);
         public void DeletePaymentService(int Id);
     }

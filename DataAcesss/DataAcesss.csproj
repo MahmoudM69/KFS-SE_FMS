@@ -3,6 +3,12 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="ms Migrations\**" />
+    <EmbeddedResource Remove="ms Migrations\**" />
+    <None Remove="ms Migrations\**" />
+  </ItemGroup>
   <ItemGroup>
 	  <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="5.0.16" />
 	  <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.16" />
@@ -12,8 +18,5 @@
 	  <PackageReference Include="MySql.EntityFrameworkCore" Version="5.0.13" />
 	  <PackageReference Include="MySqlConnector" Version="2.1.8" />
 	  <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="5.0.4" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Migrations\" />
   </ItemGroup>
 </Project>

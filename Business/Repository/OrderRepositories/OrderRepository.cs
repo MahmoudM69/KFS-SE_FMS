@@ -3,6 +3,7 @@ using Business.IRepository.IOrderRepositories;
 using DataAcesss.Data;
 using DataAcesss.Data.CustomerModels;
 using DataAcesss.Data.OrderModels;
+using DataAcesss.Data.PaymentModels;
 using DataAcesss.Data.Shared;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -26,8 +27,7 @@ namespace Business.Repository.OrderRepositories
         {
             if (order != null && order.Establishment_ProductId > 0 && order.CustomerId != null)
             {
-                var dbOrder = context.Orders.Add(order);
-                order.Payment = null;
+                var dbOrder = context.Orders.Add(order).Entity;
                 if (dbOrder != null)
                 {
                     context.SaveChanges();
@@ -39,8 +39,8 @@ namespace Business.Repository.OrderRepositories
         {
             if (id.ToString() != null)
             {
-                Order order = await context.Orders.Include(x => x.establishment_Product).ThenInclude(y => y.Product)
-                                                  .Include(x => x.establishment_Product).ThenInclude(y => y.Establishment)
+                Order order = await context.Orders.Include(x => x.Establishment_Product).ThenInclude(y => y.Product)
+                                                  .Include(x => x.Establishment_Product).ThenInclude(y => y.Establishment)
                                                   .Include(x => x.Customer)
                                                   .Include(x => x.FinancialAid)
                                                   .Include(x => x.Payment)
@@ -57,7 +57,7 @@ namespace Business.Repository.OrderRepositories
         {
             if (id.ToString() != null)
             {
-                List<Order> orders = await context.Orders.Include(x => x.establishment_Product).ThenInclude(y => y.Product)
+                List<Order> orders = await context.Orders.Include(x => x.Establishment_Product).ThenInclude(y => y.Product)
                                                          .Include(x => x.FinancialAid)
                                                          .Include(x => x.Payment)
                                                          .Where(x => x.CustomerId == id).ToListAsync();
@@ -84,8 +84,8 @@ namespace Business.Repository.OrderRepositories
         public async Task<List<Order>> GetAllOrdersAsync()
         {
             List<Order> orders = await context.Orders.Include(x => x.Customer)
-                                                                          .Include(x => x.establishment_Product).ThenInclude(y => y.Product)
-                                                                          .Include(x => x.establishment_Product).ThenInclude(y => y.Establishment)
+                                                                          .Include(x => x.Establishment_Product).ThenInclude(y => y.Product)
+                                                                          .Include(x => x.Establishment_Product).ThenInclude(y => y.Establishment)
                                                                           .Include(x => x.FinancialAid)
                                                                           .Include(x => x.Payment)
                                                                           .Include(x => x.Payment).ToListAsync();
@@ -100,7 +100,7 @@ namespace Business.Repository.OrderRepositories
         {
             if (order != null)
             {
-                if(order.OrderId > 0 && order != null && order.CustomerId != null && order.establishment_Product != null)
+                if(order.OrderId > 0 && order != null && order.CustomerId != null && order.Establishment_Product != null)
                 {
                     var dbOrder = context.Orders.Update(order);
                     if (dbOrder.Entity != null)
@@ -119,6 +119,9 @@ namespace Business.Repository.OrderRepositories
             {
                 Order order = context.Orders.Find(Id);
                 order.Payment = null;
+                order.Establishment_Product = null;
+                order.PaymentId = null;
+                order.FinancialAidId = null;
                 if (order != null)
                 {
                     context.Orders.Remove(order);

@@ -18,15 +18,18 @@ namespace DataAcesss.Data.PaymentModels
         [ForeignKey("PaymentServiceId")]
         public int? PaymentServiceId { get; set; }
         public virtual PaymentService PaymentService { get; set; }
-        public virtual List<Order> Orders { get; set; }
+        [ForeignKey("OrderId")]
+        public int OrderId { get; set; }
+        public virtual Order Order { get; set; }
         public decimal Total { get; set; }
         public decimal CalcTotal()
         {
             decimal total = 0;
-            foreach(Order order in Orders)
-            {
-                total = total + order.Total;
-            }
+            //foreach(Order order in Orders)
+            //{
+            //    total = total + order.Total;
+            //}
+            total = total + Order.Total;
             total = total + (PaymentService != null ? PaymentService.PaymentServiceFee : 0);
             return total;
         }

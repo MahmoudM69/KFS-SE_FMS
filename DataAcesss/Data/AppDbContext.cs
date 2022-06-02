@@ -16,6 +16,7 @@ namespace DataAcesss.Data
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) 
         { }
+
         public DbSet<Establishment> Establishments { get; set; }
         public DbSet<EstablishmentImage> EstablishmentImages { get; set; }
         public DbSet<EstablishmentType> EstablishmentTypes { get; set; }
@@ -39,15 +40,15 @@ namespace DataAcesss.Data
             builder.Entity<Order>().HasOne(c => c.Customer)
                                    .WithMany(co => co.Orders)
                                    .HasForeignKey(ci => ci.CustomerId);
-            builder.Entity<Order>().HasOne(espr => espr.establishment_Product)
+            builder.Entity<Order>().HasOne(espr => espr.Establishment_Product)
                                    .WithMany(espro => espro.Orders)
                                    .HasForeignKey(espri => espri.Establishment_ProductId);
             builder.Entity<Order>().HasOne(f => f.FinancialAid)
                                    .WithMany(fo => fo.Orders)
                                    .HasForeignKey(fi => fi.FinancialAidId);
             builder.Entity<Order>().HasOne(p => p.Payment)
-                                   .WithMany(po => po.Orders)
-                                   .HasForeignKey(pi => pi.PaymentId);
+                                   .WithOne(po => po.Order)
+                                   .HasForeignKey<Payment>(pi => pi.OrderId);
 
             builder.Entity<ProductType_FinancialAid>().HasOne(pt => pt.ProductType)
                                                    .WithMany(ptfa => ptfa.ProductType_FinancialAids)

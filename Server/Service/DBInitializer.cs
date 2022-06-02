@@ -25,10 +25,10 @@ namespace Server.Service
         }
         public void Initialize()
         {
-            if(context.Database.GetPendingMigrations().Count() > 0)
-            {
-                context.Database.Migrate();
-            }
+            //if(context.Database.GetPendingMigrations().Count() > 0)
+            //{
+            //    context.Database.Migrate();
+            //}
 
             string[] Roles = new string[4] { "Admin", "Manager", "Employee", "Customer" };
             if (Roles.All(r => context.Roles.Any(db => db.Name == r)))
