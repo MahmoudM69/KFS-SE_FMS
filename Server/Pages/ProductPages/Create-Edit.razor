@@ -1,7 +1,7 @@
 ﻿@page "/Product/Create"
 @page "/Product/Edit/{id:int}"
 @using System.IO
-@using Business.IRepository.IApplicationUserRepositories.EmoloyeeIRepositories
+@using Business.IRepository.IApplicationUserRepositories.IEmoloyeeRepositories
 @using Business.IRepository.IEstablishmentRepositories
 @using Business.IRepository.IProductRepositories
 @using Business.IRepository.ISharedRepository
@@ -160,7 +160,7 @@
                     <div class="form-group">
                         <button class="btn btn-success col mb-1" type="submit">@title</button>
                         <button class="btn btn-danger col mb-1" type="reset">Reset</button>
-                        <NavLink href="@($"ProductType")" class="btn btn-primary">Back to List</NavLink>
+                        <NavLink href="@($"ProductType")" class="btn btn-primary col mb-1">Back to List</NavLink>
                     </div>
                 </EditForm>
             </div>

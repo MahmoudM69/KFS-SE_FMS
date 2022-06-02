@@ -1,4 +1,4 @@
-﻿using Business.IRepository.IApplicationUserRepositories.EmoloyeeIRepositories;
+﻿using Business.IRepository.IApplicationUserRepositories.IEmoloyeeRepositories;
 using DataAcesss.Data;
 using DataAcesss.Data.EmployeeModels;
 using DataAcesss.Data.Shared;

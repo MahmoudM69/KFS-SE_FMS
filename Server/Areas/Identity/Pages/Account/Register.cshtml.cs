@@ -110,7 +110,7 @@ namespace Server.Areas.Identity.Pages.Account
                         result = await _userManager.CreateAsync(user, Input.Password);
                         await _userManager.AddToRoleAsync(user, "Employee");
                     }
-                    else if (User.IsInRole("Manager"))
+                    else if (User.IsInRole("Admin"))
                     {
                         user = new Employee
                         {

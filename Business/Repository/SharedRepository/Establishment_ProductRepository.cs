@@ -42,14 +42,28 @@ namespace Business.Repository.SharedRepository
             return null;
         }
 
+        public async Task<Establishment_Product> GetEstablishment_Product(int id)
+        {
+            if (id > 0)
+            {
+                Establishment_Product establishment_Product = await context.Establishment_Products.Include(x => x.Establishment)
+                                                                                             .Include(x => x.Product).ThenInclude(p => p.ProductImages)
+                                                                                             .Include(x => x.Orders)
+                                                                                             .FirstOrDefaultAsync(x => x.Id == id);
+                if (establishment_Product != null)
+                    return establishment_Product;
+            }
+            return null;
+        }
+
         public async Task<List<Establishment_Product>> GetEstablishment_ProductProducts(int id)
         {
             if(id > 0)
             {
                 List<Establishment_Product> establishment_Products = await context.Establishment_Products.Include(x => x.Establishment)
-                                                                                                               .Include(x => x.Product).ThenInclude(p => p.ProductImages)
-                                                                                                               .Include(x => x.Orders)
-                                                                                                               .Where(x => x.EstablishmentId == id).ToListAsync();
+                                                                                                         .Include(x => x.Product).ThenInclude(p => p.ProductImages)
+                                                                                                         .Include(x => x.Orders)
+                                                                                                         .Where(x => x.EstablishmentId == id).ToListAsync();
                 if(establishment_Products.Any())
                     return establishment_Products;
             }

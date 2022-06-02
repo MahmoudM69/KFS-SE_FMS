@@ -10,16 +10,20 @@ using DataAcesss.Data;
 using DataAcesss.Data.FinancialAidModels;
 using System.ComponentModel.DataAnnotations;
 using DataAcesss.Data.Shared;
+using Microsoft.AspNetCore.Identity;
+using DataAcesss.Data.EmployeeModels;
 
 namespace Server.Pages.FinancialAidPages
 {
     public class EditModel : PageModel
     {
         private readonly DataAcesss.Data.AppDbContext _context;
+        private readonly UserManager<ApplicationUser> userManager;
 
-        public EditModel(DataAcesss.Data.AppDbContext context)
+        public EditModel(DataAcesss.Data.AppDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            this.userManager = userManager;
         }
 
         public class InputModel
@@ -78,6 +82,11 @@ namespace Server.Pages.FinancialAidPages
         // For more details, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
         {
+            if (HttpContext.User.IsInRole("Manager"))
+            {
+                Employee manager = _context.Employees.FirstOrDefault(u => u.UserName == HttpContext.User.Identity.Name);
+                Input.EstablishmentId = manager.EstablishmentId;
+            }
             if (!ModelState.IsValid)
             {
                 return Page();

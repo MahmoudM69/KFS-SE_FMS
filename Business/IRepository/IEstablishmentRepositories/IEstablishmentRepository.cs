@@ -8,7 +8,7 @@ namespace Business.IRepository.IEstablishmentRepositories
     {
         public Task<Establishment> CreateEstablishment(Establishment establishment);
         public Task<Establishment> GetEstablishment(int id);
-        public Task<List<Establishment>> GetAllEstablishments();
+        public List<Establishment> GetAllEstablishments();
         public Task<Establishment> UpdateEstablishment(Establishment establishment);
         public void DeleteEstablishment(int id);
     }

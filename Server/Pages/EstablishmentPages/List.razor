@@ -1,5 +1,5 @@
 ﻿@page "/EstablishmentList"
-@using Business.IRepository.IApplicationUserRepositories.EmoloyeeIRepositories
+@using Business.IRepository.IApplicationUserRepositories.IEmoloyeeRepositories
 @using Business.IRepository.IEstablishmentRepositories
 @using Business.IRepository.IProductRepositories
 @using Business.IRepository.ISharedRepository
@@ -52,8 +52,10 @@
 
 @code {
     public List<Establishment> Establishments { get; set; } = new();
-    protected override async Task OnInitializedAsync()
+
+    protected override Task OnInitializedAsync()
     {
-        Establishments = await EstablishmentRepository.GetAllEstablishments();
+        Establishments = EstablishmentRepository.GetAllEstablishments();
+        return base.OnInitializedAsync();
     }
 }

@@ -9,8 +9,4 @@
   <ItemGroup>
     <ProjectReference Include="..\DataAcesss\DataAcesss.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="IRepository\IApplicationUserRepositories\CustomerIRepositories\" />
-    <Folder Include="Repository\ApplicationUserRepositories\CustomerRepositories\" />
-  </ItemGroup>
 </Project>

@@ -11,27 +11,29 @@
 <p>
     <a asp-page="Create">Create New</a>
 </p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.EstablishmentType[0].Type)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model.EstablishmentType) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Type)
-            </td>
-            <td>
-                <a asp-page="./Edit" asp-route-id="@item.EstablishmentTypeId">Edit</a> |
-                <a asp-page="./Details" asp-route-id="@item.EstablishmentTypeId">Details</a> |
-                <a asp-page="./Delete" asp-route-id="@item.EstablishmentTypeId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<div style="overflow:auto;">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.EstablishmentType[0].Type)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.EstablishmentType) {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Type)
+                    </td>
+                    <td>
+                        <a asp-page="./Edit" asp-route-id="@item.EstablishmentTypeId">Edit</a> |
+                        <a asp-page="./Details" asp-route-id="@item.EstablishmentTypeId">Details</a> |
+                        <a asp-page="./Delete" asp-route-id="@item.EstablishmentTypeId">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

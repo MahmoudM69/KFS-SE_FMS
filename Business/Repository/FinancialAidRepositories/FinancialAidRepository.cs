@@ -48,11 +48,11 @@ namespace Business.Repository.FinancialAidRepositories
             return null;
         }
 
-        public async Task<List<FinancialAid>> GetAllFinancialAids()
+        public List<FinancialAid> GetAllFinancialAids()
         {
-            List<FinancialAid> financialAids = await context.FinancialAids.Include(x => x.ProductType_FinancialAids).ThenInclude(y => y.ProductType)
+            List<FinancialAid> financialAids = context.FinancialAids.Include(x => x.ProductType_FinancialAids).ThenInclude(y => y.ProductType)
                                                                        .Include(x => x.Establishment)
-                                                                       .Include(x => x.Orders).ToListAsync();
+                                                                       .Include(x => x.Orders).ToList();
             if (financialAids.Any())
             {
                 return financialAids;
@@ -77,15 +77,15 @@ namespace Business.Repository.FinancialAidRepositories
             return null;
         }
 
-        public async Task<List<FinancialAid>> GetProductTypeFinancialAids(int id)
+        public List<FinancialAid> GetProductTypeFinancialAids(int id)
         {
             if (id > 0)
             {
-                List<FinancialAid> financialAids = await context.FinancialAids.Include(x => x.ProductType_FinancialAids).ThenInclude(y => y.ProductType)
-                                                                       .Include(x => x.Establishment)
-                                                                       .Include(x => x.Orders)
-                                                                       .Where(x => x.ProductType_FinancialAids.FirstOrDefault(y => y.ProductTypeId == id).ProductTypeId == id)
-                                                                       .ToListAsync();
+                List<FinancialAid> financialAids = context.FinancialAids.Include(x => x.ProductType_FinancialAids).ThenInclude(y => y.ProductType)
+                                                                        .Include(x => x.Establishment)
+                                                                        .Include(x => x.Orders).Where(x => x
+                                                                        .ProductType_FinancialAids.FirstOrDefault(y => y.ProductTypeId == id)
+                                                                        .ProductTypeId == id).ToList();
                 if (financialAids.Any())
                 {
                     return financialAids;

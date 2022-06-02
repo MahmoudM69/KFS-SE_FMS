@@ -34,12 +34,15 @@
                     <input class="form-check-input" asp-for="Input.Percentage" /> @Html.DisplayNameFor(model => model.Input.Percentage)
                 </label>
             </div>
-            <div class="form-group">
-                <label asp-for="Input.EstablishmentId" class="control-label">Establishment</label>
-                <select asp-for="Input.EstablishmentId" class ="form-control" asp-items="ViewBag.EstablishmentId">
-                    <option value="" selected disabled>Select Establishment</option>
-                </select>
-            </div>
+            @if (HttpContext.User.IsInRole("Admin"))
+            {
+                <div class="form-group">
+                    <label asp-for="Input.EstablishmentId" class="control-label">Establishment</label>
+                    <select asp-for="Input.EstablishmentId" class ="form-control" asp-items="ViewBag.EstablishmentId">
+                        <option value="" selected disabled>Select Establishment</option>
+                    </select>
+                </div>
+            }
             <div class="form-group">
                 <label asp-for="Input.ProductTypeId" class="control-label">Product Type</label>
                 <select asp-for="Input.ProductTypeId" class ="form-control" asp-items="ViewBag.ProductTypeId">

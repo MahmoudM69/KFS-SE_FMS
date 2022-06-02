@@ -9,16 +9,20 @@ using DataAcesss.Data;
 using DataAcesss.Data.FinancialAidModels;
 using System.ComponentModel.DataAnnotations;
 using DataAcesss.Data.Shared;
+using Microsoft.AspNetCore.Identity;
+using DataAcesss.Data.EmployeeModels;
 
 namespace Server.Pages.FinancialAidPages
 {
     public class CreateModel : PageModel
     {
-        private readonly DataAcesss.Data.AppDbContext _context;
+        private readonly DataAcesss.Data.AppDbContext context;
+        private readonly UserManager<ApplicationUser> userManager;
 
-        public CreateModel(DataAcesss.Data.AppDbContext context)
+        public CreateModel(DataAcesss.Data.AppDbContext context, UserManager<ApplicationUser> userManager)
         {
-            _context = context;
+            this.context = context;
+            this.userManager = userManager;
         }
 
         public class InputModel
@@ -37,15 +41,17 @@ namespace Server.Pages.FinancialAidPages
 
         }
 
-        public IActionResult OnGet()
-        {
-            ViewData["EstablishmentId"] = new SelectList(_context.Establishments, "EstablishmentId", "EstablishmentName");
-            ViewData["ProductTypeId"] = new SelectList(_context.ProductTypes, "ProductTypeId", "Type");
-            return Page();
-        }
-
         [BindProperty]
         public InputModel Input { get; set; }
+
+        public IActionResult OnGetAsync()
+        {
+            if (HttpContext.User.IsInRole("Admin"))
+                ViewData["EstablishmentId"] = new SelectList(context.Establishments, "EstablishmentId", "EstablishmentName");
+
+            ViewData["ProductTypeId"] = new SelectList(context.ProductTypes, "ProductTypeId", "Type");
+            return Page();
+        }
 
         // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
         public async Task<IActionResult> OnPostAsync()
@@ -53,6 +59,11 @@ namespace Server.Pages.FinancialAidPages
             if (!ModelState.IsValid)
             {
                 return Page();
+            }
+            if (HttpContext.User.IsInRole("Manager"))
+            {
+                Employee manager = context.Employees.FirstOrDefault(u => u.UserName == HttpContext.User.Identity.Name);
+                Input.EstablishmentId = manager.EstablishmentId;
             }
             FinancialAid financialAid = new()
             {
@@ -63,15 +74,15 @@ namespace Server.Pages.FinancialAidPages
                 AidAmount = Input.AidAmount,
                 EstablishmentId = Input.EstablishmentId
             };
-            var addedFinancialAid = await _context.FinancialAids.AddAsync(financialAid);
-            await _context.SaveChangesAsync();
+            var addedFinancialAid = await context.FinancialAids.AddAsync(financialAid);
+            await context.SaveChangesAsync();
             ProductType_FinancialAid productType_FinancialAid = new()
             {
                 FinancialAidId = addedFinancialAid.Entity.FinancialAidId,
                 ProductTypeId = Input.ProductTypeId
             };
-            await _context.ProductType_FinancialAids.AddAsync(productType_FinancialAid);
-            await _context.SaveChangesAsync();
+            await context.ProductType_FinancialAids.AddAsync(productType_FinancialAid);
+            await context.SaveChangesAsync();
 
             return RedirectToPage("./Index");
         }

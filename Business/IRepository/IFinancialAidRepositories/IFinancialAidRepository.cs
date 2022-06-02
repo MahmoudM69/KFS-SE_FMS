@@ -11,9 +11,9 @@ namespace Business.IRepository.IFinancialAidRepositories
     {
         public Task<FinancialAid> CreateFinancialAid(FinancialAid financialAid);
         public Task<FinancialAid> GetFinancialAid(int id);
-        public Task<List<FinancialAid>> GetAllFinancialAids();
+        public List<FinancialAid> GetAllFinancialAids();
         public Task<List<FinancialAid>> GetEstablishmentFinancialAids(int id);
-        public Task<List<FinancialAid>> GetProductTypeFinancialAids(int id);
+        public List<FinancialAid> GetProductTypeFinancialAids(int id);
         public Task<FinancialAid> UpdateFinancialAid(int id, FinancialAid financialAid);
         public void DeleteFinancialAid(int id);
     }

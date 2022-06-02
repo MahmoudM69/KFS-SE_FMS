@@ -21,15 +21,14 @@ namespace Business.Repository.PaymentRepositories
         {
             this.context = context;
         }
-        public async Task<Payment> CreatePayment(Payment payment)
+        public Payment CreatePayment(Payment payment)
         {
             if (payment != null)
             {
-                var dbPayment = await context.Payments.AddAsync(payment);
+                var dbPayment = context.Payments.Add(payment);
                 if (dbPayment != null)
                 {
-                    await context.SaveChangesAsync();
-                    
+                    context.SaveChanges();
                     return (dbPayment.Entity);
                 }
             }
@@ -42,7 +41,7 @@ namespace Business.Repository.PaymentRepositories
             {
                 Payment payment = await context.Payments.Include(x => x.PaymentService)
                                                         .Include(x => x.Orders).ThenInclude(y => y.Customer)
-                                                        .Include(x => x.Orders).ThenInclude(y => y.Establishment_Product)
+                                                        .Include(x => x.Orders).ThenInclude(y => y.establishment_Product)
                                                         .Include(x => x.Orders).ThenInclude(y => y.FinancialAid)
                                                         .FirstOrDefaultAsync(x => x.PaymentId == id);
                 if (payment != null)
@@ -55,7 +54,7 @@ namespace Business.Repository.PaymentRepositories
 
         public async Task<List<Payment>> GetAllCustomerPayments(string id)
         {
-            Customer customer = await context.Customers.Include(x => x.Orders).ThenInclude(y => y.Establishment_Product)
+            Customer customer = await context.Customers.Include(x => x.Orders).ThenInclude(y => y.establishment_Product)
                                                             .Include(x => x.Orders).ThenInclude(y => y.FinancialAid)
                                                             .FirstOrDefaultAsync(x => x.Id == id);
             if (customer.Orders.Any())
@@ -74,7 +73,7 @@ namespace Business.Repository.PaymentRepositories
         {
             List<Payment> payments = await context.Payments.Include(x => x.PaymentService)
                                                             .Include(x => x.Orders).ThenInclude(y => y.Customer)
-                                                            .Include(x => x.Orders).ThenInclude(y => y.Establishment_Product)
+                                                            .Include(x => x.Orders).ThenInclude(y => y.establishment_Product)
                                                             .Include(x => x.Orders).ThenInclude(y => y.FinancialAid)
                                                             .ToListAsync();
             if (payments.Any())
@@ -101,11 +100,11 @@ namespace Business.Repository.PaymentRepositories
             return null;
         }
 
-        public async void DeletePayment(int Id)
+        public void DeletePayment(int Id)
         {
             if (Id.ToString() != null)
             {
-                Payment payment = await context.Payments.FindAsync(Id);
+                Payment payment = context.Payments.Find(Id);
                 if (payment != null)
                 {
                     context.Payments.Remove(payment);

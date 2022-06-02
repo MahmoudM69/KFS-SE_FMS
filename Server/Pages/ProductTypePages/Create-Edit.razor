@@ -46,14 +46,12 @@
                 <ValidationMessage For="() => ProductType.Description"></ValidationMessage>
             </div>
             <div class="form-group">
-                <button class="btn btn-primary" type="submit">@title</button>
-                <button class="btn btn-primary col-6" type="reset">Reset</button>
+                <button class="btn btn-success col mb-1" type="submit">@title</button>
+                <button class="btn btn-danger col mb-1" type="reset">Reset</button>
+                <NavLink href="@($"ProductType")" class="btn btn-primary col mb-1">Back to List</NavLink>
             </div>
         </EditForm>
     </div>
-</div>
-<div>
-    <a asp-page="Index">Back to List</a>
 </div>
 
 @code {
@@ -69,7 +67,7 @@
             ProductType = await ProductTypeRepository.GetProductType(id.Value);
         }
     }
-    private async void Submit()
+    private async Task Submit()
     {
         if (title == "Create")
         {
@@ -79,5 +77,6 @@
         {
             var createdProduct = await ProductTypeRepository.UpdateProductType(id.Value, ProductType);
         }
+        NavigationManager.NavigateTo("/producttype");
     }
 }

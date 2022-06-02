@@ -1,10 +1,12 @@
-using Business.IRepository.IApplicationUserRepositories.EmoloyeeIRepositories;
+using Business.IRepository.IApplicationUserRepositories.ICustomerRepositories;
+using Business.IRepository.IApplicationUserRepositories.IEmoloyeeRepositories;
 using Business.IRepository.IEstablishmentRepositories;
 using Business.IRepository.IFinancialAidRepositories;
 using Business.IRepository.IOrderRepositories;
 using Business.IRepository.IPaymentRepositories;
 using Business.IRepository.IProductRepositories;
 using Business.IRepository.ISharedRepository;
+using Business.Repository.ApplicationUserRepositories.CustomerRepositories;
 using Business.Repository.ApplicationUserRepositories.EmoloyeeRepositories;
 using Business.Repository.EstablishmentRepositories;
 using Business.Repository.FinancialAidRepositories;
@@ -27,10 +29,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Server.Areas.Identity;
 using Server.Data;
+using Server.Service;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Server
 {
@@ -47,8 +47,8 @@ namespace Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            // services.AddDbContext<AppDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("MSSQL")));
-            services.AddDbContextPool<AppDbContext>(options => options.UseMySQL(Configuration.GetConnectionString("MySql")));
+            services.AddDbContext<AppDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("MSSQL")));
+            //services.AddDbContextPool<AppDbContext>(options => options.UseMySQL(Configuration.GetConnectionString("MySql")));
             services.AddIdentity<ApplicationUser, IdentityRole>(options =>
             {
                 options.Password.RequiredLength = 8;
@@ -74,11 +74,13 @@ namespace Server
             services.AddScoped<IProductImageRepository, ProductImageRepository>();
             services.AddScoped<IEstablishment_ProductRepository, Establishment_ProductRepository>();
             services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+            services.AddScoped<ICustomerRepository, CustomerRepository>();
             services.AddScoped<IFileUploadRepository, FileUploadRepository>();
+            services.AddScoped<IDBInitializer, DBInitializer>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IDBInitializer dBInitializer)
         {
             if (env.IsDevelopment())
             {
@@ -94,12 +96,10 @@ namespace Server
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
             app.UseRouting();
-
             app.UseAuthentication();
             app.UseAuthorization();
-
+            dBInitializer.Initialize();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

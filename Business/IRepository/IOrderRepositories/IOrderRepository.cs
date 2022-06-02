@@ -14,7 +14,7 @@ namespace Business.IRepository.IOrderRepositories
         public Task<List<Order>> GetAllOrdersAsync();
         public Task<List<Order>> GetAllCustomerOrders(string id);
         public Task<List<Order>> GetAllEstablishmentOrders(int id);
-        public Task<Order> UpdateOrder(Order order);
+        public Order UpdateOrder(Order order);
         public void DeleteOrder(int Id);
     }
 }

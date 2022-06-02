@@ -54,11 +54,11 @@ namespace Business.Repository.EstablishmentRepositories
             return null;
         }
 
-        public async Task<List<Establishment>> GetAllEstablishments()
+        public List<Establishment> GetAllEstablishments()
         {
-            List<Establishment> establishments = await context.Establishments.Include(x => x.EstablishmentImages).Include(x => x.EstablishmentType)
+            List<Establishment> establishments = context.Establishments.Include(x => x.EstablishmentImages).Include(x => x.EstablishmentType)
                                                                                    .Include(x => x.Employees).Include(x => x.FinancialAids)
-                                                                                   .Include(x => x.Establishment_Products).ToListAsync();
+                                                                                   .Include(x => x.Establishment_Products).ToList();
             if (establishments.Any())
             {
                 return(establishments);

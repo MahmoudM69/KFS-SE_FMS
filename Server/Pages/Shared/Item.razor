@@ -63,8 +63,14 @@
         }
         @if(ExpirationDate != null)
         {
-            <p>@Price.ToString("c")</p>
-            <button @onclick="@(() => Order.InvokeAsync(Id))" class="btn btn-primary col">Order</button>
+            <p>@Total.Value.ToString("c")</p>
+            @if (IsAuthenticated)
+            {
+                <button @onclick="@(() => Order.InvokeAsync(Id))" class="btn btn-primary col">Order</button>
+            }else
+            {
+                <a href="/Identity/Account/Login" class="btn btn-primary col">Order</a>
+            }
         }
     </div>
 </div>
@@ -82,18 +88,21 @@
     public string Title { get; set; }
     [Parameter]
     public string Description { get; set; }
-    public decimal Price { get; set; }
     [Parameter]
     public decimal? RetailPrice { get; set; }
+    [Parameter]
+    public decimal? Total { get; set; }
     [Parameter]
     public bool? Percentage { get; set; }
     [Parameter]
     public decimal? AidAmount { get; set; }
     [Parameter]
     public DateTime? ExpirationDate { get; set; }
+    private bool IsAuthenticated { get; set; }
 
     protected override Task OnParametersSetAsync()
     {
+        IsAuthenticated = AuthenticationStateProvider.GetAuthenticationStateAsync().GetAwaiter().GetResult().User.Identity.IsAuthenticated;
         if(Img == "")
         {
             if(Type == "Establishment")
@@ -108,17 +117,6 @@
             }else
             {
                 Img = ("Images/Shared/image-not-found.jpg");
-            }
-        }
-        if(ExpirationDate != null)
-        {
-            if (Percentage.Value)
-            {
-                Price = RetailPrice.Value - (RetailPrice.Value * (AidAmount.Value / 100));
-            }
-            else
-            {
-                Price = RetailPrice.Value - AidAmount.Value;
             }
         }
         return base.OnParametersSetAsync();

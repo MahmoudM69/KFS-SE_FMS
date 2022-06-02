@@ -16,6 +16,7 @@ namespace DataAcesss.Data.ProductModels
         public string ProductDescription { get; set; }
 
         [ForeignKey("ProductTypeId")]
+        [Required, Range(1, double.MaxValue, ErrorMessage = "Please choose a type")]
         public int ProductTypeId { get; set; }
         public virtual ProductType ProductType { get; set; }
         public virtual List<ProductImage> ProductImages { get; set; }

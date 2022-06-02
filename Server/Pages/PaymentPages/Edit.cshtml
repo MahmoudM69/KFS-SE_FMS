@@ -27,11 +27,6 @@
                 <span asp-validation-for="Payment.PaymentStatus" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Payment.PaymentServiceId" class="control-label"></label>
-                <select asp-for="Payment.PaymentServiceId" class="form-control" asp-items="ViewBag.PaymentServiceId"></select>
-                <span asp-validation-for="Payment.PaymentServiceId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
         </form>

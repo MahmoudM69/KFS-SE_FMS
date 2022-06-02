@@ -39,7 +39,7 @@ namespace DataAcesss.Data
             builder.Entity<Order>().HasOne(c => c.Customer)
                                    .WithMany(co => co.Orders)
                                    .HasForeignKey(ci => ci.CustomerId);
-            builder.Entity<Order>().HasOne(espr => espr.Establishment_Product)
+            builder.Entity<Order>().HasOne(espr => espr.establishment_Product)
                                    .WithMany(espro => espro.Orders)
                                    .HasForeignKey(espri => espri.Establishment_ProductId);
             builder.Entity<Order>().HasOne(f => f.FinancialAid)

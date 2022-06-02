@@ -9,7 +9,7 @@ namespace Business.IRepository.IPaymentRepositories
 {
     public interface IPaymentRepository
     {
-        public Task<Payment> CreatePayment(Payment Payment);
+        public Payment CreatePayment(Payment Payment);
         public Task<Payment> GetPayment(int Id);
         public Task<List<Payment>> GetAllCustomerPayments(string id);
         public Task<List<Payment>> GetAllPayments();

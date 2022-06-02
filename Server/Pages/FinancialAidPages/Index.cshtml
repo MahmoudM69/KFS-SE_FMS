@@ -11,57 +11,59 @@
 <p>
     <a asp-page="Create">Create New</a>
 </p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.ProductType_FinancialAids[0].FinancialAid.MinBalance)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ProductType_FinancialAids[0].FinancialAid.MaxBalance)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ProductType_FinancialAids[0].FinancialAid.Percentage)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ProductType_FinancialAids[0].FinancialAid.AidAmount)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ProductType_FinancialAids[0].FinancialAid.Establishment)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ProductType_FinancialAids[0].ProductType)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model.ProductType_FinancialAids) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.FinancialAid.MinBalance)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FinancialAid.MaxBalance)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FinancialAid.Percentage)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FinancialAid.AidAmount)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FinancialAid.Establishment.EstablishmentName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ProductType.Type)
-            </td>
-            <td>
-                <a asp-page="./Edit" asp-route-id="@item.FinancialAidId">Edit</a> |
-                <a asp-page="./Details" asp-route-id="@item.FinancialAidId">Details</a> |
-                <a asp-page="./Delete" asp-route-id="@item.FinancialAidId">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<div style="overflow:auto;">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.ProductType_FinancialAids[0].FinancialAid.MinBalance)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ProductType_FinancialAids[0].FinancialAid.MaxBalance)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ProductType_FinancialAids[0].FinancialAid.Percentage)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ProductType_FinancialAids[0].FinancialAid.AidAmount)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ProductType_FinancialAids[0].FinancialAid.Establishment)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ProductType_FinancialAids[0].ProductType)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.ProductType_FinancialAids) {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FinancialAid.MinBalance)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FinancialAid.MaxBalance)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FinancialAid.Percentage)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FinancialAid.AidAmount)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FinancialAid.Establishment.EstablishmentName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ProductType.Type)
+                    </td>
+                    <td>
+                        <a asp-page="./Edit" asp-route-id="@item.FinancialAidId">Edit</a> |
+                        <a asp-page="./Details" asp-route-id="@item.FinancialAidId">Details</a> |
+                        <a asp-page="./Delete" asp-route-id="@item.FinancialAidId">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

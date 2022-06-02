@@ -1,0 +1,202 @@
+﻿@page "/Orders"
+@using Business.IRepository.IApplicationUserRepositories.ICustomerRepositories
+@using Business.IRepository.IFinancialAidRepositories
+@using Business.IRepository.IOrderRepositories
+@using Business.IRepository.IPaymentRepositories
+@using Business.IRepository.ISharedRepository
+@using DataAcesss.Data.CustomerModels
+@using DataAcesss.Data.FinancialAidModels
+@using DataAcesss.Data.OrderModels
+@using DataAcesss.Data.PaymentModels
+@using DataAcesss.Data.Shared
+@using Microsoft.AspNetCore.Identity
+@using System.ComponentModel.DataAnnotations
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserManager<ApplicationUser> userManager
+@inject IOrderRepository OrderRepository
+@inject ICustomerRepository CustomerRepository
+@inject IFinancialAidRepository FinancialAidRepository
+@inject IPaymentRepository PaymentRepository
+@inject IPaymentServiceRepository PaymentServiceRepository
+@attribute [Authorize(Roles ="Customer")]
+
+
+<h3>Orders</h3>
+
+<div style="overflow:auto;">
+    <table class="table table-bordered table-striped table-hover mb-0">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Product</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>Order Info</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody class="table table-bordered table-striped table-hover">
+            @if (OrderList != null && OrderList.Any())
+            {
+                foreach(Order order in OrderList)
+                {
+                    //establishment_Product = establishment_ProductRepository.GetEstablishment_Product(order.Establishment_ProductId.Value).GetAwaiter().GetResult();
+                    FinancialAids = FinancialAidRepository.GetProductTypeFinancialAids(order.establishment_Product.Product.ProductTypeId);                    
+                    <tr>
+                        <td>@order.OrderId</td>
+                        <td>@order.establishment_Product.Product.ProductName</td>
+                        <td>@order.establishment_Product.Product.ProductDescription</td>
+                        <td>@order.Total.ToString("c")</td>
+                        @if(order.Stats == "pending")
+                        {
+                            <div style="overflow:auto">
+                                <EditForm Model="order" OnValidSubmit="()=> Submit(order)">
+                                    <DataAnnotationsValidator/>
+                                    <td>
+                                        <InputNumber @bind-Value="@order.Quantity" min="0" max="@order.establishment_Product.Quantity" class="form-control" placeholder="Quantity" title="Quantity" style="width: 100px;" reqired></InputNumber>
+                                    </td>
+                                    <td>
+                                        <InputSelect @bind-Value="@order.FinancialAidId" class="form-control" title="Financial Aid" style="width: 135px;" reqired>
+                                            <option value="" selected>Financial Aid</option>
+                                            @if (FinancialAids != null && FinancialAids.Any())
+                                            {
+                                                @foreach (var financialAid in FinancialAids)
+                                                {
+                                                    <option value="@financialAid.FinancialAidId">@financialAid.AidAmount @if(financialAid.Percentage){<span>%</span>}</option>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <option value="" disabled>No Financail Aid for this product</option>
+                                            }
+                                        </InputSelect>
+                                    </td>
+                                    <td>
+                                        <InputSelect @bind-Value="order.Payment.PaymentServiceId" class="form-control" title="Payment Service" style="width: 135px;" reqired>
+                                            <option value="" disabled selected>Payment Service</option>
+                                            @if (PaymentServices != null && PaymentServices.Any())
+                                            {
+                                                @foreach (var PaymentService in PaymentServices)
+                                                {
+                                                    <option value="@PaymentService.PaymentServiceId">@PaymentService.PaymentServiceName > @PaymentService.PaymentServiceFee @if(PaymentService.Percentage){<span>%</span>}</option>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <option value="" disabled>No Payment Services available</option>
+                                            }
+                                        </InputSelect>
+                                    </td>
+                                    <td>
+                                        <button type="submit" class="btn btn-success" title="Confirm">Y</button>
+                                        <button type="reset" class="btn btn-primary" title="Reset">R</button>
+                                        <button @onclick="()=>Delete(order.OrderId)" class="btn btn-danger" title="Cancel">N</button>
+                                    </td>
+                                </EditForm>
+                            </div>
+                        }
+                        else
+                        {
+                            <td>
+                                <td title="Quantity">@order.Quantity</td>
+                                @if(order.FinancialAid != null)
+                                {
+                                    <td title="Financial Aid">@order.FinancialAid.AidAmount @if(order.FinancialAid.Percentage){<span>%</span>}</td>
+                                }else
+                                {
+                                    <td title="Financial Aid">No Financial Aid</td>
+                                }
+                                <td title="Payment Service">@order.Payment.PaymentService.PaymentServiceName > @order.Payment.PaymentService.PaymentServiceFee @if(order.Payment.PaymentService.Percentage){<span>%</span>}</td>
+                                <td><button @onclick="()=>Canacel(order)" class="btn btn-danger" title="Cancel">Cancel</button></td>
+                            </td>
+                        }
+                        @{
+                            order.Payment.Total = order.Quantity == 0 ? 0 : (order.Total / (decimal)(order.establishment_Product.Quantity / order.Quantity));
+                            if(order.FinancialAidId != null && order.Payment.Total > 0)
+                            {
+                                FinancialAid financialAid = FinancialAids.FirstOrDefault(x => x.FinancialAidId == order.FinancialAidId.Value);
+                                order.Payment.Total = order.Payment.Total - (financialAid.Percentage ? (order.Payment.Total * (financialAid.AidAmount / 100)) : financialAid.AidAmount);
+                            }
+                            if(order.Payment.Total < 0)
+                            {
+                                order.Payment.Total = order.Quantity == 0 ? 0 : (order.Total / (decimal)(order.establishment_Product.Quantity / order.Quantity));
+                            }
+                            if(order.Payment.PaymentServiceId != null && order.Payment.Total > 0)
+                            {
+                                PaymentService paymentService = PaymentServices.FirstOrDefault(x => x.PaymentServiceId == order.Payment.PaymentServiceId);
+                                order.Payment.Total = order.Payment.Total + (paymentService.Percentage ? (order.Payment.Total * (paymentService.PaymentServiceFee / 100)) : paymentService.PaymentServiceFee);
+                            }
+                        }
+                        <td>@order.Payment.Total.ToString("c")</td>
+                    </tr>
+                }
+
+            }
+            else
+            {
+                <tr>There are no orders to show</tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    private List<Order> OrderList { get; set; } = new();
+    private List<FinancialAid> FinancialAids { get; set; }
+    private List<PaymentService> PaymentServices { get; set; }
+    private Payment Payment { get; set; }
+    private decimal Total { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = AuthenticationStateProvider.GetAuthenticationStateAsync().GetAwaiter().GetResult().User;
+        string customerId = userManager.GetUserId(user);
+        OrderList = await OrderRepository.GetAllCustomerOrders(customerId);
+        if(OrderList != null)
+        {
+            foreach(Order order in OrderList)
+            {
+                if(order.Stats == "pending")
+                {
+                    order.Payment = new()
+                    {
+                        PaymentServiceId = null,
+                        PaymentDate = DateTime.Now,
+                        PaymentStatus = "pending",
+                    };
+                }
+            }
+        }
+        PaymentServices = PaymentServiceRepository.GetAllPaymentServices();
+    }
+    private void Submit(Order order)
+    {
+        if (order.Quantity <= 0 || order.Payment.PaymentServiceId == null)
+            return;
+        order.Payment.PaymentId = 0;
+        Payment payment = order.Payment;
+        payment = PaymentRepository.CreatePayment(payment);
+        order.Stats = "Confirmed";
+        order.PaymentId = payment.PaymentId;
+        order = OrderRepository.UpdateOrder(order);
+        StateHasChanged();
+    }
+    private void Delete(int id)
+    {
+        OrderRepository.DeleteOrder(id);
+        OrderList.Remove(OrderList.FirstOrDefault(x => x.OrderId == id));
+        StateHasChanged();
+    }
+    private void Canacel(Order order)
+    {
+        PaymentRepository.DeletePayment(order.PaymentId.Value);
+        order.FinancialAid = null;
+        order.FinancialAidId = null;
+        order.Payment = new();
+        order.PaymentId = null;
+        order.Quantity = 0;
+        order.Stats = "pending";
+        OrderRepository.UpdateOrder(order);
+        StateHasChanged();
+    }
+}

@@ -1,6 +1,7 @@
-﻿@page "/ProductList"
+﻿@page "/Product"
+@page "/ProductList"
 @page "/ProductList/{id:int}"
-@using Business.IRepository.IApplicationUserRepositories.EmoloyeeIRepositories
+@using Business.IRepository.IApplicationUserRepositories.IEmoloyeeRepositories
 @using Business.IRepository.IEstablishmentRepositories
 @using Business.IRepository.IOrderRepositories
 @using Business.IRepository.IProductRepositories
@@ -13,6 +14,7 @@
 @using DataAcesss.Data.Shared
 @using Microsoft.AspNetCore.Identity
 @using Server.Pages.Shared
+@using System.Security.Claims
 @inject NavigationManager NavigationManager
 @inject IFileUploadRepository FileUploadRepository
 @inject IProductRepository ProductRepository
@@ -55,6 +57,7 @@
                                   Title="@estProd.Product.ProductName" 
                                   Description="@estProd.Product.ProductDescription" 
                                   RetailPrice="@estProd.RetailPrice"
+                                  Total="@estProd.CalcTotal()"
                                   Percentage="@estProd.Percentage" 
                                   AidAmount="@estProd.AidAmount" 
                                   ExpirationDate="@estProd.ExpirationDate"
@@ -80,7 +83,7 @@ else
     </div>
     <div class="row mt-4">
         <div class="col-12">
-            <table class="table table-bordered table-hover">
+            <table class="table table-bordered table-hover" style="overflow:auto;">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -120,8 +123,7 @@ else
 
 
 @code {
-    [CascadingParameter]
-    private Task<AuthenticationState> authenticationStateTask { get; set; }
+    private ClaimsPrincipal user { get; set; } = new();
     private ApplicationUser User { get; set; } = new();
     private bool IsCustomer { get; set; }
 
@@ -129,15 +131,17 @@ else
     public int? id { get; set; }
     public ICollection<Product> products { get; set; } = new List<Product>();
     public List<Establishment_Product> Establishment_Products { get; set; } = new();
-    protected override async Task OnParametersSetAsync()
+    protected override async Task OnInitializedAsync()
     {
-        var authState = await authenticationStateTask;
-        var user = authState.User;
+        user = AuthenticationStateProvider.GetAuthenticationStateAsync().GetAwaiter().GetResult().User;
         User = await userManager.GetUserAsync(user);
-        if (await userManager.IsInRoleAsync(User, "Customer") || !signInManager.IsSignedIn(user))
+        if (user.IsInRole("Customer") || !signInManager.IsSignedIn(user))
             IsCustomer = true;
         else
             IsCustomer = false;
+    }
+    protected override async Task OnParametersSetAsync()
+    {
         if(id != null)
         {
             Establishment establishment = await EstablishmentRepository.GetEstablishment(id.Value);
@@ -183,15 +187,13 @@ else
     {
         Order order = new()
         {
-            Quantity = Establishment_Products.FirstOrDefault(x => x.ProductId == Id).Quantity,
             Stats = "pending",
             CustomerId = User.Id,
-            Establishment_ProductId = Establishment_Products.FirstOrDefault(x => x.ProductId == Id).Id,
-            FinancialAidId = 3,
-            PaymentId = 1
+            Quantity = 0,
+            Establishment_ProductId = Establishment_Products.FirstOrDefault(x => x.ProductId == Id).Id
         };
-
+        order.Total = Establishment_Products.FirstOrDefault(x => x.ProductId == Id).CalcTotal();
         OrderRepository.CreateOrder(order);
-        NavigationManager.NavigateTo("/");
+        NavigationManager.NavigateTo("/Orders");
     }
 }

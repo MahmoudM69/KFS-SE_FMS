@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Business.IRepository.IApplicationUserRepositories.EmoloyeeIRepositories
+namespace Business.IRepository.IApplicationUserRepositories.IEmoloyeeRepositories
 {
     public interface IEmployeeRepository
     {

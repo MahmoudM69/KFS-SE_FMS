@@ -27,6 +27,7 @@ namespace Business.Repository.OrderRepositories
             if (order != null && order.Establishment_ProductId > 0 && order.CustomerId != null)
             {
                 var dbOrder = context.Orders.Add(order);
+                order.Payment = null;
                 if (dbOrder != null)
                 {
                     context.SaveChanges();
@@ -38,8 +39,8 @@ namespace Business.Repository.OrderRepositories
         {
             if (id.ToString() != null)
             {
-                Order order = await context.Orders.Include(x => x.Establishment_Product).ThenInclude(y => y.Product)
-                                                  .Include(x => x.Establishment_Product).ThenInclude(y => y.Establishment)
+                Order order = await context.Orders.Include(x => x.establishment_Product).ThenInclude(y => y.Product)
+                                                  .Include(x => x.establishment_Product).ThenInclude(y => y.Establishment)
                                                   .Include(x => x.Customer)
                                                   .Include(x => x.FinancialAid)
                                                   .Include(x => x.Payment)
@@ -56,10 +57,12 @@ namespace Business.Repository.OrderRepositories
         {
             if (id.ToString() != null)
             {
-                Customer customer = await context.Customers.Include(x => x.Orders).FirstOrDefaultAsync(x => x.Id == id);
-                if(customer != null && customer.Orders.Any())
+                List<Order> orders = await context.Orders.Include(x => x.establishment_Product).ThenInclude(y => y.Product)
+                                                         .Include(x => x.FinancialAid)
+                                                         .Include(x => x.Payment)
+                                                         .Where(x => x.CustomerId == id).ToListAsync();
+                if(orders != null && orders.Any())
                 {
-                    List<Order> orders = customer.Orders;
                     return(orders);
                 }
             }
@@ -81,8 +84,8 @@ namespace Business.Repository.OrderRepositories
         public async Task<List<Order>> GetAllOrdersAsync()
         {
             List<Order> orders = await context.Orders.Include(x => x.Customer)
-                                                                          .Include(x => x.Establishment_Product).ThenInclude(y => y.Product)
-                                                                          .Include(x => x.Establishment_Product).ThenInclude(y => y.Establishment)
+                                                                          .Include(x => x.establishment_Product).ThenInclude(y => y.Product)
+                                                                          .Include(x => x.establishment_Product).ThenInclude(y => y.Establishment)
                                                                           .Include(x => x.FinancialAid)
                                                                           .Include(x => x.Payment)
                                                                           .Include(x => x.Payment).ToListAsync();
@@ -93,16 +96,16 @@ namespace Business.Repository.OrderRepositories
             return null;
         }
 
-        public async Task<Order> UpdateOrder(Order order)
+        public Order UpdateOrder(Order order)
         {
             if (order != null)
             {
-                if(order.OrderId > 0 && order != null && order.Customer != null && order.Establishment_Product != null)
+                if(order.OrderId > 0 && order != null && order.CustomerId != null && order.establishment_Product != null)
                 {
                     var dbOrder = context.Orders.Update(order);
                     if (dbOrder.Entity != null)
                     {
-                        await context.SaveChangesAsync();
+                        context.SaveChanges();
                         return(dbOrder.Entity);
                     }
                 }
@@ -110,11 +113,12 @@ namespace Business.Repository.OrderRepositories
             return null;
         }
 
-        public async void DeleteOrder(int Id)
+        public void DeleteOrder(int Id)
         {
             if (Id.ToString() != null)
             {
-                Order order = await context.Orders.FindAsync(Id);
+                Order order = context.Orders.Find(Id);
+                order.Payment = null;
                 if (order != null)
                 {
                     context.Orders.Remove(order);
