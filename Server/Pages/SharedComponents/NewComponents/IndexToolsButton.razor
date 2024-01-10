@@ -1,0 +1,38 @@
+﻿@namespace Server.Pages.SharedComponents.NewComponents
+
+@if(showBar || CreateEvent.HasDelegate)
+{
+    <MudPaper Elevation="0" Class="rounded-circle mt-6 static" style="float: right;">
+        <MudFab StartIcon=@fabBtnIcon style="height:64px; width:64px;"
+                OnClick=@(() => ChangeBarState(!isBarOpen, true))
+                onmouseenter=@(() => ChangeBarState(true))
+                onmouseleave=@(() => ChangeBarState(false)) />
+        @if (showBar)
+        {
+            <MudPopover Open=isBarOpen Paper=false Duration="0"
+                        AnchorOrigin=Origin.CenterLeft
+                        TransformOrigin=Origin.CenterRight
+                        onmouseenter=@(() => ChangeBarState(true))
+                        onmouseleave=@(() => ChangeBarState(false))>
+                <div style="width:80vh;margin-right: 10px;">
+                    <IndexToolBar Values=Values Search=@(Search is not null ? Search : default!) RefreshEvent=RefreshEvent
+                                  ViewStyleChangedEvent=ViewStyleChangedEvent ViewItemModeChangedEvent=ViewItemModeChangedEvent />
+                </div>
+            </MudPopover>
+        }
+
+        @if (CreateEvent.HasDelegate)
+        {
+            <MudPopover Open=isBarOpen Paper=false Duration="0"
+                        AnchorOrigin=Origin.BottomCenter
+                        TransformOrigin=Origin.TopCenter
+                        onmouseenter=@(() => ChangeBarState(true))
+                        onmouseleave=@(() => ChangeBarState(false))>
+                <MudTooltip Text="Create New">
+                    <MudFab StartIcon=@Icons.Material.Rounded.Add OnClick=@(async() => await Create())
+                            style="margin-top: 10px; height:47px; width:47px;"/>
+                </MudTooltip>
+            </MudPopover>
+        }
+    </MudPaper>
+}

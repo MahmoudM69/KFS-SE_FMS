@@ -3,6 +3,12 @@
 @using Server.Data
 @inject WeatherForecastService ForecastService
 
+<BaseToolBar></BaseToolBar>
+
+<br />
+<br />
+<br />
+
 <h1>Weather forecast</h1>
 
 <p>This component demonstrates fetching data from a service.</p>
@@ -37,7 +43,7 @@ else
 }
 
 @code {
-    private WeatherForecast[] forecasts;
+    private WeatherForecast[]? forecasts;
 
     protected override async Task OnInitializedAsync()
     {

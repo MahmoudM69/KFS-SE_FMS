@@ -1,0 +1,45 @@
+﻿@if(PageTitle != null)
+{
+    <PageTitle>@PageTitle</PageTitle>
+}
+else
+{
+    if (PageTypeNumber < 3)
+    {
+        <PageTitle>@PageName @PageType</PageTitle>
+    }
+    else
+    {
+        <PageTitle>@PageType @PageName</PageTitle>
+    }
+}
+
+@code {
+    [Parameter]
+    public RenderFragment<string>? PageTitle { get; set; }
+
+    [Parameter]
+    public string? PageName { get; set; }
+
+    [Parameter]
+    public string? PageType { get; set; }
+
+    [Parameter]
+    public int PageTypeNumber { get; set; } = 1;
+
+    [Parameter]
+    public Dictionary<int, string> PageTypes { get; set; } = new()
+    {
+        {1, "Index"},
+        {2, "Details"},
+        {3, "Create"},
+        {4, "Edit"},
+        {5, "Recover"},
+        {6, "All"}
+    };
+
+    protected override void OnParametersSet()
+    {
+        PageType = PageTypes.FirstOrDefault(x => x.Key == PageTypeNumber).Value;
+    }
+}

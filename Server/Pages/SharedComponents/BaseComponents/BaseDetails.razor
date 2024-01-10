@@ -1,0 +1,52 @@
+﻿@namespace Server.Pages.Components.BaseComponents
+@inherits CancellableComponent
+@typeparam T
+
+@*<CustomPageTitle PageTypeNumber=2 PageName=@EntityName></CustomPageTitle>*@
+
+<PageTitle>@(EntityName.Titleize()) Details</PageTitle>
+
+<Loading Status=_loadingStatus LoadingTitle=@($"Loading the {EntityName}...") FailedTitle="Error loading the required data"
+         Title=@($"{EntityName} Details") Back=@($"/{EntityName}")>
+    <MudPaper Class=@ContainerClass Style=@ContainerStyle>
+        <MudGrid>
+            <MudItem sm="12" Class=@ContentClass Style=@ContentStyle>
+                @if (ChildContent is not null && _dto is not null)
+                {
+                    @ChildContent(_dto)
+                }
+            </MudItem>
+            <MudItem xs="12" Class=@ActionBtnContainerClass Style=@ActionBtnContainerStyle>
+                @if (Edit is not null)
+                {
+                    <LoadingButton Variant="Variant.Text" Color="Color.Primary" OnClick=@(async() => await Edit(_dto.Id))
+                                   Class=@ActionBtnClass Style=@ActionBtnStyle>
+                        Edit @EntityName.Titleize()
+                    </LoadingButton>
+                }
+                @if (Recover is not null && _dto.SoftDelete < 0)
+                {
+                    <LoadingButton Variant="Variant.Text" Color="Color.Warning" OnClick=@(async() => await Recover(_dto.Id))
+                                   Class=@ActionBtnClass Style=@ActionBtnStyle>
+                        Recover @EntityName.Titleize()
+                    </LoadingButton>
+
+                    if (HardDelete is not null)
+                    {
+                        <LoadingButton Variant="Variant.Text" Color="Color.Error" OnClick=@(async() => await HardDelete(_dto.Id))
+                                       Class=@ActionBtnClass Style=@ActionBtnStyle>
+                            Delete @EntityName.Titleize() Forever!
+                        </LoadingButton>
+                    }
+                }
+                else if (SoftDelete is not null && _dto is not null && _dto.SoftDelete >= 0)
+                {
+                    <LoadingButton Variant="Variant.Text" Color="Color.Error" OnClick=@(async() => await SoftDelete(_dto.Id))
+                                   Class=@ActionBtnClass Style=@ActionBtnStyle>
+                        Delete @EntityName.Titleize()
+                    </LoadingButton>
+                }
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
+</Loading>

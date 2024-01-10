@@ -1,4 +1,6 @@
-﻿<div class="top-row pl-4 navbar navbar-dark">
+﻿@inject PageHistoryState HistoryState
+
+@*<div class="top-row pl-4 navbar navbar-dark">
     <a class="navbar-brand" href="">Server</a>
     <button class="navbar-toggler" @onclick="ToggleNavMenu">
         <span class="navbar-toggler-icon"></span>
@@ -35,3 +37,18 @@
         collapseNavMenu = !collapseNavMenu;
     }
 }
+*@
+
+
+<MudNavMenu>
+    <MudNavLink Href="/" Match="NavLinkMatch.All">Home</MudNavLink>
+    <MudNavLink Href="/counter" Match="NavLinkMatch.Prefix">Counter</MudNavLink>
+    <MudNavLink Href="/fetchdata" Match="NavLinkMatch.Prefix">Fetch data</MudNavLink>
+    <MudNavLink Href="/PaymentService" Match="NavLinkMatch.Prefix">Payment Services</MudNavLink>
+    <MudNavLink Href="/Test" Match="NavLinkMatch.Prefix">Test</MudNavLink>
+    <MudNavGroup Title="Settings" Expanded="false">
+        <MudNavLink Href="/" Match="NavLinkMatch.All">Users</MudNavLink>
+        <MudNavLink Href="/" Match="NavLinkMatch.All">Security</MudNavLink>
+    </MudNavGroup>
+    <MudNavLink Href="/" Match="NavLinkMatch.All">About</MudNavLink>
+</MudNavMenu>

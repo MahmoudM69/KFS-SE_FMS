@@ -1,0 +1,272 @@
+﻿@page "/PaymentService/"
+@page "/PaymentService/Index"
+@page "/PaymentService/List"
+@page "/PaymentServices/"
+@inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
+@inject IDialogService DialogService
+@inject IPaymentServiceDTOService PaymentServiceDTOService
+@inherits CancellableComponent
+@using Server.Pages.SharedComponents.NewComponents.BaseComponents
+
+<BaseIndelet T=PaymentServiceDTO EntityName="Payment Service" DTOsResults=@(new Result<IEnumerable<PaymentServiceDTO>>(paymentServiceDTOs))
+             DTONames=@(paymentServiceDTOs.Select(x => x.Name)) ViewStyleChangedEvent=@(style => {isList = style; StateHasChanged();})
+             Prepare=PrepareEntities Create=CreateEntity Search=SearchEntity>
+    @if(context.Any())
+    {
+        var dtos = context.ToArray();
+        <MudGrid>
+            @for(int i = 0; i < dtos.Length; i++)
+            {
+                var dto = dtos[i];
+                if (isList)
+                {
+                    <MudItem xs="12" Class="pa-2">
+                        <BaseListItem EditClicked=@((dto.SoftDelete >= 0) ? () => EditEntity(dto.Id) : default!) CarouselAutoCycle=false 
+                                      ImagesSrc=@(new List<string>() {
+                                          "https://allthatsinteresting.com/wordpress/wp-content/uploads/2020/03/quokka-leaf-smile-cute.jpg",
+                                          "https://www.pbh2.com/wordpress/wp-content/uploads/2014/02/upclose-photo-of-a-quokka.jpg",
+                                          "https://i.pinimg.com/originals/2d/3a/7e/2d3a7e1af3677a819a4d3c8d7a9b7bba.jpg",
+                                          "https://i.pinimg.com/564x/b1/13/fb/b113fb2b8d6c4f5cbae306bcbfeedc04.jpg"
+                                      })
+                                      DetailsClicked=@((dto.SoftDelete >= 0) ? () => EntityDetails(dto.Id) : default!)
+                                      DeleteClicked=@((dto.SoftDelete >= 0) ? () => SoftDeleteEntity(dto.Id) : default!)
+                                      RecoverClicked=@((dto.SoftDelete < 0) ? () => RecoverEntity(dto.Id) : default!)
+                                      DeleteForeverClicked=@((dto.SoftDelete < 0) ? () => HardDeleteEntity(dto.Id) : default!)>
+                            <MudGrid>
+                                <MudItem xs="6" Class="d-flex align-center">
+                                    <MudTextField ReadOnly=true @bind-Value=dto.Name Label=@nameof(dto.Name) />
+                                </MudItem>
+                                <MudItem xs="6" Class="d-flex align-center">
+                                    <MudTextField ReadOnly=true @bind-Value=dto.Provider Label=@nameof(dto.Provider) />
+                                </MudItem>
+                                <MudItem xs="6" Class="d-flex align-center">
+                                    <MudTextField ReadOnly=true @bind-Value=dto.Fee Label=@nameof(dto.Fee)
+                                                  Adornment=Adornment.Start AdornmentIcon=@Icons.Material.Filled.AttachMoney />
+                                </MudItem>
+                                <MudItem xs="6" Class="d-flex align-center">
+                                    <MudTextField ReadOnly=true @bind-Value=dto.FeePercentage Label=@nameof(dto.Provider)
+                                                  Adornment=Adornment.Start AdornmentIcon=@Icons.Material.Filled.AttachMoney />
+                                </MudItem>
+                            </MudGrid>
+                        </BaseListItem>
+                    </MudItem>
+                }
+                else
+                {
+                    <MudItem lg="3" md="4" sm="6" xs="12">
+                        <BaseCardItem EditClicked=@((dto.SoftDelete >= 0) ? () => EditEntity(dto.Id) : default!) CarouselAutoCycle=false
+                                      ImagesSrc=@(new List<string>() {
+                                          "https://allthatsinteresting.com/wordpress/wp-content/uploads/2020/03/quokka-leaf-smile-cute.jpg",
+                                          "https://www.pbh2.com/wordpress/wp-content/uploads/2014/02/upclose-photo-of-a-quokka.jpg",
+                                          "https://i.pinimg.com/originals/2d/3a/7e/2d3a7e1af3677a819a4d3c8d7a9b7bba.jpg",
+                                          "https://i.pinimg.com/564x/b1/13/fb/b113fb2b8d6c4f5cbae306bcbfeedc04.jpg"
+                                      })
+                                      DetailsClicked=@((dto.SoftDelete >= 0) ? () => EntityDetails(dto.Id) : default!)
+                                      DeleteClicked=@((dto.SoftDelete >= 0) ? () => SoftDeleteEntity(dto.Id) : default!)
+                                      RecoverClicked=@((dto.SoftDelete < 0) ? () => RecoverEntity(dto.Id) : default!)
+                                      DeleteForeverClicked=@((dto.SoftDelete < 0) ? () => HardDeleteEntity(dto.Id) : default!)>
+                            <MudGrid>
+                                <MudItem xs="6">
+                                    <MudTextField ReadOnly=true @bind-Value=dto.Name Label=@nameof(dto.Name) />
+                                </MudItem>
+                                <MudItem xs="6">
+                                    <MudTextField ReadOnly=true @bind-Value=dto.Provider Label=@nameof(dto.Provider) />
+                                </MudItem>
+                                <MudItem xs="6">
+                                    <MudTextField ReadOnly=true @bind-Value=dto.Fee Label=@nameof(dto.Fee)
+                                                  Adornment=Adornment.Start AdornmentIcon=@Icons.Material.Filled.AttachMoney />
+                                </MudItem>
+                                <MudItem xs="6">
+                                    <MudTextField ReadOnly=true @bind-Value=dto.FeePercentage Label=@nameof(dto.Provider)
+                                                  Adornment=Adornment.Start AdornmentIcon=@Icons.Material.Filled.AttachMoney />
+                                </MudItem>
+                            </MudGrid>
+                        </BaseCardItem>
+                    </MudItem>
+                }
+            }
+        </MudGrid>
+    }
+    else
+    {
+        <MudItem xs="12" Class="ma-4 pa-4">
+            <MudText Typo="Typo.h3">Sorry there are no payment service to show.</MudText>
+        </MudItem>
+    }
+</BaseIndelet>
+
+@code {
+    bool isList = false;
+    ItemMode itemMode = ItemMode.Normal;
+    IEnumerable<PaymentServiceDTO> paymentServiceDTOs = Enumerable.Empty<PaymentServiceDTO>();
+    Result<IEnumerable<PaymentServiceDTO>> paymentServiceDTOsResult = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if(!paymentServiceDTOs.Any()) await PrepareEntities(itemMode);
+    }
+
+    private async Task<Result<IEnumerable<PaymentServiceDTO>>> PrepareEntities(ItemMode mode)
+    {
+        try
+        {
+            if (mode is ItemMode.Combined)
+            {
+                paymentServiceDTOsResult = await PaymentServiceDTOService.GetAllAsync(false, CancellationToken);
+            }
+            else if (mode is ItemMode.Deleted)
+            {
+                paymentServiceDTOsResult = await PaymentServiceDTOService.FindAsync(x => x.SoftDelete < 0, false);
+            }
+            else
+            {
+                paymentServiceDTOsResult = await PaymentServiceDTOService.GetAllAsync(cancellationToken: CancellationToken);
+            }
+
+            paymentServiceDTOs = paymentServiceDTOsResult.Match(succ => succ, fail => Enumerable.Empty<PaymentServiceDTO>());
+
+            return new Result<IEnumerable<PaymentServiceDTO>>(paymentServiceDTOs);
+        }
+        catch (Exception ex)
+        {
+            return new Result<IEnumerable<PaymentServiceDTO>>(ex);
+        }
+    }
+
+    private void CreateEntity()
+    {
+        NavigationManager.NavigateTo($"/{"Payment Service".Replace(" ", "")}/Create");
+    }
+
+    private Task EntityDetails(int id)
+    {
+        NavigationManager.NavigateTo($"/{"Payment Service".Replace(" ", "")}/Details/{id}");
+        return Task.CompletedTask;
+    }
+
+    private Task EditEntity(int id)
+    {
+        NavigationManager.NavigateTo($"/{"Payment Service".Replace(" ", "")}/Edit/{id}");
+        return Task.CompletedTask;
+    }
+
+    private async Task<IEnumerable<string>> SearchEntity(string name)
+    {
+        paymentServiceDTOs = paymentServiceDTOsResult.Match(
+            succ => succ.Where(x => string.IsNullOrWhiteSpace(name) || x.Name.Contains(name, StringComparison.InvariantCultureIgnoreCase)),
+            fail => Enumerable.Empty<PaymentServiceDTO>()
+        );
+
+        StateHasChanged();
+
+        return await Task.Run(() => paymentServiceDTOs.Select(x => x.Name));
+    }
+
+    private Task SoftDeleteEntity(int id)
+    {
+        try
+        {
+            if (paymentServiceDTOs.Select(x => x.Id).Contains(id) is not true) throw new BadRequestException();
+
+            Snackbar.ShowSnackbar($"ARE YOU SURE YOU WANT TO DELETE THIS {"Payment Service".ToUpper()}?", Severity.Success, "YES", Color.Inherit, async () =>
+            {
+                _ = (await PaymentServiceDTOService.SoftDeleteAsync(id, CancellationToken)).Match(
+                    succ =>
+                    {
+                        Snackbar.ShowSnackbar($"The {"Payment Service".ToLower()} was successfully recovered!", Severity.Success);
+                        StateHasChanged();
+                        return succ;
+                    },
+                    excp => HandleFailEntity<PaymentServiceDTO>(excp, $"Error: Couldn't recover the {"Payment Service".ToLower()}."));
+            });
+            return Task.CompletedTask;
+        }
+        catch (Exception ex)
+        {
+            HandleException(ex, $"Error: Couldn't delete the Payment Service.");
+            return Task.CompletedTask;
+        }
+    }
+    public Task RecoverEntity(int id)
+    {
+        try
+        {
+            if (paymentServiceDTOs.Select(x => x.Id).Contains(id) is not true) throw new BadRequestException();
+
+            Snackbar.ShowSnackbar($"Are you sure you want to recover this {"Payment Service".ToLower()}?", Severity.Normal, "YES", Color.Inherit, async () =>
+            {
+                _ = (await PaymentServiceDTOService.RecoverAsync(id, CancellationToken)).Match(
+                    succ =>
+                    {
+                        Snackbar.ShowSnackbar($"The {"Payment Service".ToLower()} was successfully recovered!", Severity.Success);
+                        StateHasChanged();
+                        return succ;
+                    },
+                    excp => HandleFailEntity<PaymentServiceDTO>(excp, $"Error: Couldn't recover the {"Payment Service".ToLower()}."));  
+            });
+            return Task.CompletedTask;
+        }
+        catch (Exception ex)
+        {
+            HandleException(ex, $"Error: Couldn't recover the Payment Service.");
+            return Task.CompletedTask;
+        }
+    }
+    public Task HardDeleteEntity(int id)
+    {
+        try
+        {
+            if (paymentServiceDTOs.Select(x => x.Id).Contains(id) is not true) throw new BadRequestException();
+
+            Snackbar.ShowSnackbar($"ARE YOU SURE YOU WANT TO DELETE THIS {"Payment Service".ToUpper()}?", Severity.Error, "YES", Color.Inherit, async () =>
+            {
+                var parameters = new DialogParameters<Dialog>()
+                {
+                    { x => x.Header, $"DELETING {"Payment Service".ToUpper()}" },
+                    { x => x.Content, $"ARE YOU SURE YOU WANT TO DELETE THIS {"Payment Service".ToUpper()} FOREVER?" },
+                    { x => x.ButtonText, "YES DELETE!" },
+                    { x => x.ButtonColor, Color.Error },
+                };
+
+                var dialog = await DialogService!.ShowAsync<Dialog>("FINAL WARNING", parameters);
+                var result = await dialog.Result;
+
+                if (!result.Canceled && (bool)result.Data)
+                {
+                    _ = (await PaymentServiceDTOService.DeleteAsync(id, CancellationToken)).Match(
+                        succ =>
+                        {
+                            Snackbar.ShowSnackbar($"The {"Payment Service".ToLower()} was successfully deleted!", Severity.Success);
+                            StateHasChanged();
+                            return succ;
+                        },
+                        excp => HandleFailEntity<PaymentServiceDTO>(excp, $"Error: Couldn't delete the {"Payment Service".ToLower()}.")
+                    );
+                }
+            });
+
+            return Task.CompletedTask;
+        }
+        catch (Exception ex)
+        {
+            HandleException(ex, $"Error: Couldn't delete the {"Payment Service"}.");
+            return Task.CompletedTask;
+        }
+    }
+
+    R? HandleFailPrepare<R>(Exception excp) where R : class
+    {
+        return HandleFailEntity<R>(excp, $"Error: Couldn't get the required data for the {"Payment Service".Pluralize()}.");
+    }
+    R? HandleFailEntity<R>(Exception excp, string snackbarMessage, Severity snackbarSeverity = Severity.Error) where R : class
+    {
+        HandleException(excp, snackbarMessage, snackbarSeverity);
+        return default(R);
+    }
+    void HandleException(Exception excp, string snackbarMessage, Severity snackbarSeverity = Severity.Error)
+    {
+        Console.WriteLine(excp.Message);
+        Snackbar.ShowSnackbar(snackbarMessage, snackbarSeverity);
+    }
+}

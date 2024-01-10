@@ -1,0 +1,133 @@
+﻿
+body {
+    background: #fff;
+}
+
+.contain {
+    width: 500px;
+    margin: auto;
+    font-size: 128px;
+    color: #4e4e4e;
+    line-height: 300px;
+    padding: 10px 0 30px 0;
+    border-bottom: 3px solid #4e4e4e;
+}
+
+.text {
+    font-size: 18px;
+    margin: 30px;
+    color: #4e4e4e;
+    text-align: center;
+}
+
+.contain > div {
+    display: inline-block;
+    vertical-align: bottom;
+}
+
+.ufo {
+    background: #2f9d62;
+    border: 5px solid #4e4e4e;
+    width: 250px;
+    height: 50px;
+    border-radius: 50% / 100%;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    transform: rotate(-7deg);
+    animation: ufo 1s infinite alternate;
+}
+
+    .ufo:after {
+        background: #37B873;
+        content: "";
+        position: absolute;
+        border: 5px solid #4e4e4e;
+        width: 250px;
+        height: 35px;
+        border-radius: 50% / 100%;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        margin-top: 44px;
+        margin-left: -5px;
+    }
+
+    .ufo:before {
+        background: #15AC84;
+        content: "";
+        position: absolute;
+        border: 5px solid #4e4e4e;
+        width: 70px;
+        height: 30px;
+        border-radius: 50% / 100%;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+        margin-top: -31px;
+        margin-left: 80px;
+    }
+
+
+@keyframes ufo {
+    from {
+        margin-top: 120px;
+        transform: rotate(-7deg);
+    }
+
+    to {
+        margin-top: 150px;
+        transform: rotate(-0deg);
+    }
+}
+
+
+
+.light {
+    text-align: center;
+    border-bottom: 300px solid #1BBD8E;
+    border-left: 70px solid transparent;
+    border-right: 70px solid transparent;
+    height: 0;
+    width: 240px;
+    animation: light 1s infinite alternate;
+}
+
+
+@keyframes light {
+    from {
+        border-bottom: 300px solid #1BBD8E;
+    }
+
+    to {
+        border-bottom: 270px solid #1BBD8E;
+    }
+}
+
+@keyframes lightsh {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0.5;
+    }
+}
+
+
+.lightsh {
+    animation: lightsh 1s infinite alternate;
+    background: #21CA96;
+    width: 240px;
+    height: 20px;
+    border-radius: 100%;
+    margin-top: -11px;
+}
+
+    .lightsh:before {
+        content: "";
+        position: absolute;
+        background: #169D76;
+        width: 100px;
+        height: 10px;
+        border-radius: 100%;
+        margin-top: 5px;
+        margin-left: 70px;
+    }

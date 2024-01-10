@@ -1,0 +1,25 @@
+﻿<div class="alert @Type mt-4">
+    @BeforeIcon
+    <strong>@Title</strong>
+    @BeforeMessage
+    @Extra
+    @AfterMessage
+    @AfterIcon
+</div>
+
+@code {
+    [Parameter]
+    public string Type { get; set; } = "alert-secondary";
+    [Parameter]
+    public string Title { get; set; } = string.Empty;
+    [Parameter]
+    public RenderFragment? BeforeIcon { get; set; }
+    [Parameter]
+    public string BeforeMessage { get; set; } = string.Empty;
+    [Parameter]
+    public RenderFragment? Extra { get; set; }
+    [Parameter]
+    public string AfterMessage { get; set; } = string.Empty;
+    [Parameter]
+    public RenderFragment? AfterIcon { get; set; }
+}

@@ -1,0 +1,14 @@
+﻿@inherits CancellableComponent
+@typeparam T
+
+<MudExpansionPanels Class=@PanelsClass MultiExpansion=MultiExpansion Dense=PanelsDense
+                    DisableGutters=PanelsDisableGutters DisableBorders=PanelsDisableBorders>
+
+    <MudExpansionPanel Class=@PanelClass Dense=PanelDense DisableGutters=PanelDisableGutters>
+        <TitleContent>
+        </TitleContent>
+        <ChildContent>
+            <BaseListItem></BaseListItem>
+        </ChildContent>
+    </MudExpansionPanel>
+</MudExpansionPanels>

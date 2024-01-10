@@ -1,0 +1,141 @@
+﻿<MudGrid>
+    <MudItem xs="12">
+        <MudAutocomplete T="KeyValuePair<int, string>" Label="@Label" ValueChanged="@(e => Select(e))" IsOpenChanged="@(e => Open(e))"
+                         Text="@text" Required="@IsRequired" RequiredError="@RequiredError" SearchFunc="@Search"
+                         ToStringFunc="@(e=> e.Value)" AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary">
+            <ItemTemplate Context="e">
+                <MudText>
+                    @if (SelectedItems.Any(x => x == e.Key))
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.CheckBox" Class="mb-n1 mr-3" />
+
+                        @(e.Value)
+                    }
+                    else
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.CheckBoxOutlineBlank" Class="mb-n1 mr-3" />
+
+                        @(e.Value)
+                    }
+                </MudText>
+            </ItemTemplate>
+            <ItemSelectedTemplate Context="e">
+                <MudText>
+                    <MudIcon Icon="@Icons.Material.Filled.CheckBox" Class="mb-n1 mr-3" />@(e.Value)
+                </MudText>
+            </ItemSelectedTemplate>
+        </MudAutocomplete>
+    </MudItem>
+    <MudItem xs="12" md="12">
+        <MudPaper Class="pa-2 overflow-y-auto overflow-x-hidden" MaxHeight="100px">
+            <MudGrid>
+                <MudItem xs="12">
+                    <MudText Class="mb-n3" Typo="Typo.h6">
+                        @SelectedText:
+                    </MudText>
+                </MudItem>
+                <MudItem xs="12">
+                    @if (SelectedItems.Any())
+                    {
+                        foreach (var item in Items)
+                        {
+                            if (SelectedItems.Contains(item.Key))
+                            {
+                                <MudChip OnClose="(() => RemoveElement(item.Key))">@(item.Value)</MudChip>
+                            }
+                        }
+                    }
+                    else
+                    {
+                        <MudChip Color="Color.Primary">Nothing is selected</MudChip>
+                    }
+                </MudItem>
+            </MudGrid>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+@code {
+    [Parameter]
+    public string Label { get; set; } = "Search Items";
+
+    [Parameter]
+    public string SelectedText { get; set; } = "Multi-Selected values";
+
+    [Parameter]
+    public Dictionary<int, string> Items { get; set; } = new();
+
+    [Parameter]
+    public List<int> SelectedItems { get; set; } = new();
+
+    [Parameter]
+    public bool IsRequired { get; set; } = false;
+
+    [Parameter]
+    public string RequiredError { get; set; } = "This field is required";
+
+
+    private string text = "";
+
+
+    private void Open(bool isOpen)
+    {
+        if (isOpen)
+        {
+            text = "";
+        }
+        else
+        {
+            text = "";
+            foreach (var item in Items)
+            {
+                text += item.Value + ", ";
+            }
+        }
+    }
+
+    private string FixText(List<int> selectedItems)
+    {
+        var items = Items.Where(x => selectedItems.Contains(x.Key)).ToDictionary(k => k.Key, v => v.Value);
+        var text = "";
+        foreach(var item in items)
+        {
+            text += item.Value + ", ";
+        }
+        return text;
+    }
+
+    private void RemoveElement(int item)
+    {
+        int? exists = SelectedItems.FirstOrDefault(x => x == item);
+        if (exists != null)
+        {
+            SelectedItems.Remove(exists.Value);
+            FixText(SelectedItems);
+        }
+    }
+
+    private void Select(KeyValuePair<int, string> item)
+    {
+        int? exists = SelectedItems.FirstOrDefault(x => x == item.Key);
+        if (exists != null)
+        {
+            SelectedItems.Remove(exists.Value);
+        }
+        else
+        {
+            SelectedItems.Add(item.Key);
+        }
+        text = FixText(SelectedItems);
+    }
+
+    private Task<IEnumerable<KeyValuePair<int, string>>> Search(string value)
+    {
+        return Task.Run(() =>
+        {
+            List<string> queryTerms = value.ToLower().Split(' ').ToList();
+
+            return Items.Where(x => x.Value.ToLower().Split(' ').ToList().Any(xp => queryTerms.Any(qp => qp == xp)));
+        });
+    }
+}

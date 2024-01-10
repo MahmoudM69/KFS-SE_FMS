@@ -1,0 +1,121 @@
+﻿<MudAutocomplete T="KeyValuePair<int, string>" Label="@Label" ValueChanged="@(e => Select(e))" Required="@IsRequired" RequiredError="@RequiredError"
+                 Value="@(Items.FirstOrDefault(x => x.Key == SelectedItem))" Text="@(Items.FirstOrDefault(x => x.Key == SelectedItem).Value)" ReadOnly="@IsReadOnly"
+                 SearchFunc="@SearchItem" ToStringFunc="@(e=> e.Value)" AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary">
+    <ItemTemplate Context="e">
+        <MudText>
+            @if (SelectedItems.Any(x => x == e.Key) && IsMultiple)
+            {
+                <MudIcon Icon="@Icons.Material.Filled.CheckBox" Class="mb-n1 mr-3" />
+
+                @(e.Value)
+            }
+            else
+            {
+                <MudIcon Icon="@Icons.Material.Filled.CheckBoxOutlineBlank" Class="mb-n1 mr-3" />
+
+                @(e.Value)
+            }
+        </MudText>
+    </ItemTemplate>
+    <ItemSelectedTemplate Context="e">
+        <MudText>
+            <MudIcon Icon="@Icons.Material.Filled.CheckBox" Class="mb-n1 mr-3" />@(e.Value)
+        </MudText>
+    </ItemSelectedTemplate>
+</MudAutocomplete>
+
+@code {
+    [Parameter]
+    public string Label { get; set; } = "Search Items";
+
+    [Parameter]
+    public Dictionary<int, string> Items { get; set; } = new();
+
+    [Parameter]
+    public int SelectedItem { get; set; }
+
+    [Parameter]
+    public List<int> SelectedItems { get; set; } = new();
+
+    [Parameter]
+    public bool IsRequired { get; set; } = false;
+
+    [Parameter]
+    public bool IsMultiple { get; set; } = false;
+
+    [Parameter]
+    public bool UseText { get; set; } = true;
+
+    [Parameter]
+    public string RequiredError { get; set; } = "This field is required";
+
+    [Parameter]
+    public bool IsReadOnly { get; set; } = false;
+
+    [Parameter]
+    public EventCallback<List<int>> SelectedChanged { get; set; }
+
+    private string text = string.Empty;
+
+    private string FixText(List<int> selectedItems)
+    {
+        if (!IsMultiple)
+        {
+            var item = Items.FirstOrDefault(x => selectedItems.Contains(x.Key));
+            return item.Value;
+        }
+
+        var items = Items.Where(x => selectedItems.Contains(x.Key)).ToDictionary(k => k.Key, v => v.Value);
+        var text = "";
+        foreach (var item in items)
+        {
+            text += item.Value + ", ";
+        }
+        return text;
+    }
+
+    private void Select(KeyValuePair<int, string> item)
+    {
+        if(IsMultiple)
+        {
+            //SelectedItems.Clear();
+            //SelectedItems.Add(item.Key);
+            int? exists = SelectedItems.FirstOrDefault(x => x == item.Key);
+            if (exists != null)
+            {
+                SelectedItems.Remove(exists.Value);
+            }
+            else
+            {
+                SelectedItems.Add(item.Key);
+            }
+            if (UseText) text = FixText(SelectedItems);
+        }
+        else
+        {
+            SelectedItems.Clear();
+            SelectedItem = item.Key;
+            SelectedItems.Add(SelectedItem);
+            if (UseText) text = item.Value;
+        }
+
+        if ((!String.IsNullOrWhiteSpace(text) || !UseText) && SelectedChanged.HasDelegate)
+            SelectedChanged.InvokeAsync(SelectedItems);
+    }
+
+    private Task<IEnumerable<KeyValuePair<int, string>>> SearchItem(string value)
+    {
+        return Task.Run(() =>
+        {
+            //var chars = new Char[] { ' ', '\\', '/', '+', '-', '*', ',', ';', ':', '"', '\'', '[', ']', '{', '}', '(', ')' };
+            //List<string> queryTerms = value.ToLower().Split(chars, StringSplitOptions.RemoveEmptyEntries).ToList();
+
+            //return Items.Where(x => x.Value.ToLower().Split(chars, StringSplitOptions.RemoveEmptyEntries).ToList().Any(xp => queryTerms.Any(qp => qp == xp)));
+            
+            if (string.IsNullOrEmpty(value))
+                return Items;
+            return Items.Where(x => x.Value.ToLower().Contains(value.ToLower()));
+        
+        });
+    }
+}

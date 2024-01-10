@@ -1,0 +1,72 @@
+﻿<MudAutocomplete T="KeyValuePair<int, decimal>" Label="@Label" Required="true" RequiredError="@RequiredError" ReadOnly="@IsReadOnly"
+                 CoerceText="@CoerceText" CoerceValue="@CoerceValue" ResetValueOnEmptyText="@ResetValueOnEmptyText"
+                 Value="@CurrentValue" ValueChanged="(ChangeValue)" TextChanged="(e => ChangeText(e))"
+                 Error="@_isError" ErrorText="@_errorMessage" ToStringFunc="@(e=> e.Value.ToString())" SearchFunc="@Search" />
+
+
+@code {
+    [Parameter]
+    public bool ResetValueOnEmptyText { get; set; }
+    [Parameter]
+    public bool CoerceValue { get; set; }
+    [Parameter]
+    public bool CoerceText { get; set; }
+    [Parameter]
+    public bool IsReadOnly { get; set; } = false;
+    [Parameter]
+    public string Label { get; set; } = "Number";
+    [Parameter]
+    public string RequiredError { get; set; } = "Must enter a number";
+    private bool _isError = false;
+    private string _errorMessage = "Value must be numeric only";
+
+    [Parameter]
+    public KeyValuePair<int, decimal> CurrentValue { get; set; }
+    [Parameter]
+    public Dictionary<int, decimal> Numbers { get; set; } = new();
+    [Parameter]
+    public EventCallback<KeyValuePair<int, decimal>> ValueChanged { get; set; }
+
+    private void ChangeValue()
+    {
+        if (ValueChanged.HasDelegate) ValueChanged.InvokeAsync(CurrentValue);
+    }
+    private void ChangeText(string textValue)
+    {
+        if (textValue != null)
+        {
+            decimal temp = 0;
+            if (Decimal.TryParse(textValue, out temp))
+            {
+                var exist = Numbers.FirstOrDefault(x => x.Value == temp);
+                exist = (exist.Key == 0 && exist.Value == 0) ? new(0, temp) : exist;
+                if (exist.Key != CurrentValue.Key || exist.Value != CurrentValue.Value)
+                {
+                    CurrentValue = exist;
+                    _isError = false;
+                    ChangeValue();
+                }
+            }
+            else
+            {
+                _errorMessage = (textValue == "") ? RequiredError : "Value must be numeric only";
+                _isError = true;
+                if (CurrentValue.Key != -1)
+                {
+                    CurrentValue = new KeyValuePair<int, decimal>(-1, 0);
+                    ChangeValue();
+                }
+            }
+        }
+    }
+
+    // Search for a value in a list
+    private async Task<IEnumerable<KeyValuePair<int, decimal>>> Search(string TextValue)
+    {
+        await Task.Yield();
+
+        if (string.IsNullOrEmpty(TextValue) || TextValue == "0") return Numbers;
+
+        return Numbers.Where(x => x.Value.ToString().Contains(TextValue));
+    }
+}

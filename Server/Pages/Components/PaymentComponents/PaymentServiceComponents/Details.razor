@@ -1,0 +1,157 @@
+﻿@page "/PaymentService/{Id:int}"
+@page "/PaymentService/Detail/{Id:int}"
+@page "/PaymentService/Details/{Id:int}"
+@inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
+@inject IDialogService DialogService
+@inject IPaymentServiceDTOService PaymentServiceDTOService
+@inherits CancellableComponent
+
+<BaseDetails T=PaymentServiceDTO EntityName="Payment Service" DTOResult=paymentServiceDTOResult
+             Prepare=PrepareData Edit=EditEntity SoftDelete=SoftDeleteEntity Recover=RecoverEntity HardDelete=HardDeleteEntity
+             ContainerClass="pa-4 gap-2 round-xl" ActionBtnClass="round-pill">
+    <MudItem xs="6">
+        <MudTextField ReadOnly=true @bind-Value=context.Name Label=@nameof(context.Name)></MudTextField>
+    </MudItem>
+    <MudItem xs="6">
+        <MudTextField ReadOnly=true @bind-Value=context.Provider Label=@nameof(context.Provider)></MudTextField>
+    </MudItem>
+    <MudItem xs="6">
+        <MudTextField ReadOnly=true @bind-Value=context.Fee Label=@nameof(context.Fee)
+                         Adornment=Adornment.Start AdornmentIcon=@Icons.Material.Filled.AttachMoney />
+    </MudItem>
+    <MudItem xs="6">
+        <MudTextField ReadOnly=true @bind-Value=context.FeePercentage Label=@nameof(context.Provider)
+                         Adornment=Adornment.Start AdornmentIcon=@Icons.Material.Filled.AttachMoney />
+    </MudItem>
+</BaseDetails>
+
+@code {
+    PaymentServiceDTO paymentServiceDTO = new();
+    Result<PaymentServiceDTO> paymentServiceDTOResult = new();
+
+    [Parameter]
+    public int Id { get; set; }
+
+    async Task<Result<PaymentServiceDTO>> PrepareData()
+    {
+        if (Id is not 0) paymentServiceDTOResult = await PaymentServiceDTOService!.GetByIdAsync(Id);
+        else paymentServiceDTOResult = new(new BadRequestException());
+
+        paymentServiceDTO = paymentServiceDTOResult.Match(succ => succ, fail => new());
+
+        return paymentServiceDTOResult;
+    }
+
+    private Task EditEntity(int id)
+    {
+        NavigationManager.NavigateTo($"/{"Payment Service".Replace(" ", "")}/Edit/{id}");
+        return Task.CompletedTask;
+    }
+
+    private Task SoftDeleteEntity(int id)
+    {
+        try
+        {
+            if (id != paymentServiceDTO.Id) throw new BadRequestException();
+
+            Snackbar.ShowSnackbar($"ARE YOU SURE YOU WANT TO DELETE THIS {"Payment Service".ToUpper()}?", Severity.Success, "YES", Color.Inherit, async () =>
+            {
+                _ = (await PaymentServiceDTOService.SoftDeleteAsync(id, CancellationToken)).Match(
+                    succ =>
+                    {
+                        Snackbar.ShowSnackbar($"The {"Payment Service".ToLower()} was successfully recovered!", Severity.Success,
+                            "Go Back?", Color.Inherit, () => { NavigationManager.NavigateTo($"/{"Payment Service".Replace(" ", "")}"); return Task.CompletedTask; });
+                        return succ;
+                    },
+                    excp => HandleFailEntity<PaymentServiceDTO>(excp, $"Error: Couldn't recover the {"Payment Service".ToLower()}."));
+            });
+            return Task.CompletedTask;
+        }
+        catch (Exception ex)
+        {
+            HandleException(ex, $"Error: Couldn't delete the Payment Service.");
+            return Task.CompletedTask;
+        }
+    }
+    public Task RecoverEntity(int id)
+    {
+        try
+        {
+            if (id != paymentServiceDTO.Id) throw new BadRequestException();
+
+            Snackbar.ShowSnackbar($"Are you sure you want to recover this {"Payment Service".ToLower()}?", Severity.Normal, "YES", Color.Inherit, async () =>
+            {
+                _ = (await PaymentServiceDTOService.RecoverAsync(id, CancellationToken)).Match(
+                    succ =>
+                    {
+                        Snackbar.ShowSnackbar($"The {"Payment Service".ToLower()} was successfully recovered!", Severity.Success,
+                            "Go Back?", Color.Inherit, () => { NavigationManager.NavigateTo($"/{"Payment Service".Replace(" ", "")}"); ; return Task.CompletedTask; });
+                        return succ;
+                    },
+                    excp => HandleFailEntity<PaymentServiceDTO>(excp, $"Error: Couldn't recover the {"Payment Service".ToLower()}."));
+            });
+            return Task.CompletedTask;
+        }
+        catch (Exception ex)
+        {
+            HandleException(ex, $"Error: Couldn't recover the Payment Service.");
+            return Task.CompletedTask;
+        }
+    }
+    public Task HardDeleteEntity(int id)
+    {
+        try
+        {
+            if (id != paymentServiceDTO.Id) throw new BadRequestException();
+
+            Snackbar.ShowSnackbar($"ARE YOU SURE YOU WANT TO DELETE THIS {"Payment Service".ToUpper()}?", Severity.Error, "YES", Color.Inherit, async () =>
+            {
+                var parameters = new DialogParameters<Dialog>()
+                {
+                    { x => x.Header, $"DELETING {"Payment Service".ToUpper()}" },
+                    { x => x.Content, $"ARE YOU SURE YOU WANT TO DELETE THIS {"Payment Service".ToUpper()} FOREVER?" },
+                    { x => x.ButtonText, "YES DELETE!" },
+                    { x => x.ButtonColor, Color.Error },
+                };
+
+                var dialog = await DialogService!.ShowAsync<Dialog>("FINAL WARNING", parameters);
+                var result = await dialog.Result;
+
+                if (!result.Canceled && (bool)result.Data)
+                {
+                    _ = (await PaymentServiceDTOService.DeleteAsync(id, CancellationToken)).Match(
+                        succ =>
+                        {
+                            Snackbar.ShowSnackbar($"The {"Payment Service".ToLower()} was successfully deleted!", Severity.Success);
+                            NavigationManager!.NavigateTo($"/{"Payment Service".Replace(" ", "")}");
+                            return succ;
+                        },
+                        excp => HandleFailEntity<PaymentServiceDTO>(excp, $"Error: Couldn't delete the {"Payment Service".ToLower()}.")
+                    );
+                }
+            });
+            return Task.CompletedTask;
+        }
+        catch (Exception ex)
+        {
+            HandleException(ex, $"Error: Couldn't delete the {"Payment Service"}.");
+            return Task.CompletedTask;
+        }
+    }
+
+    R? HandleFailPrepare<R>(Exception excp) where R : class
+    {
+        return HandleFailEntity<R>(excp, $"Error: Couldn't get the required data for the {"Payment Service".Pluralize()}.");
+    }
+    R? HandleFailEntity<R>(Exception excp, string snackbarMessage, Severity snackbarSeverity = Severity.Error) where R : class
+    {
+        HandleException(excp, snackbarMessage, snackbarSeverity);
+        return default(R);
+    }
+    void HandleException(Exception excp, string snackbarMessage, Severity snackbarSeverity = Severity.Error)
+    {
+        Console.WriteLine(excp.Message);
+        Snackbar.ShowSnackbar(snackbarMessage, snackbarSeverity);
+    }
+}

@@ -1,0 +1,64 @@
+﻿@using Server.Pages.SharedComponents.OldComponents
+@if (Status == 0)
+{
+    <h3>@LoadingTitle</h3>
+    <Prompt Title="Loading..." BeforeMessage="This may take a sec...">
+        <BeforeIcon>
+            <i class="fa-solid fa-spinner fa-spin-pulse"></i>
+        </BeforeIcon>
+    </Prompt>
+}
+else if (Status == 1)
+{
+    <header>
+        <h3>@Title</h3>
+        @if (!String.IsNullOrEmpty(TitleLink) && !String.IsNullOrEmpty(TitleLinkMessage))
+        {
+            <a class="link-primary" href="@TitleLink">@TitleLinkMessage</a>
+        }
+    </header>
+    <br />
+
+    @ChildContent
+}
+else
+{
+    <h3>@FailedTitle</h3>
+    <Prompt Title="@ErrorPromptTitle" BeforeMessage="@ErrorPromptMessage" Type="alert-danger">
+        <BeforeIcon>
+            <i class="fa fa-solid fa-xmark"></i>
+        </BeforeIcon>
+    </Prompt>
+    @if (!String.IsNullOrEmpty(ErrorHelperLink) && !String.IsNullOrEmpty(ErrorHelperLinkMessage))
+    {
+        <NavLink href="@(ErrorHelperLink)">@ErrorHelperLinkMessage | </NavLink>
+    }
+    <NavLink href="@(Back)">Go Back?</NavLink>
+}
+
+@code {
+    [Parameter]
+    public int Status { get; set; }
+    [Parameter]
+    public string LoadingTitle { get; set; } = string.Empty;
+    [Parameter]
+    public string Title { get; set; } = string.Empty;
+    [Parameter]
+    public string TitleLink { get; set; } = string.Empty;
+    [Parameter]
+    public string TitleLinkMessage { get; set; } = string.Empty;
+    [Parameter]
+    public string FailedTitle { get; set; } = string.Empty;
+    [Parameter]
+    public string ErrorPromptTitle { get; set; } = string.Empty;
+    [Parameter]
+    public string ErrorPromptMessage { get; set; } = string.Empty;
+    [Parameter]
+    public string Back { get; set; } = string.Empty;
+    [Parameter]
+    public string ErrorHelperLink { get; set; } = string.Empty;
+    [Parameter]
+    public string ErrorHelperLinkMessage { get; set; } = string.Empty;
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

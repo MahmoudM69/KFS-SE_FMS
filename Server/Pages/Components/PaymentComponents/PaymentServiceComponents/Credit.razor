@@ -1,0 +1,53 @@
+﻿@page "/PaymentService/Create"
+@page "/PaymentService/Edit/{Id:int}"
+@page "/PaymentService/Update/{Id:int}"
+@page "/PaymentService/Credit/"
+@page "/PaymentService/Credit/{Id:int}"
+@inject NavigationManager NavigationManager
+
+<BaseCredit T=PaymentServiceDTO EntityName="Payment Service" Prepare=PrepareData Submit=Submit
+            IsEdit=@(Id != null && Id != 0) ContainerClass="pa-4 gap-2 round-xl" ActionBtnClass="round-pill" >
+    <MudItem xs="6">
+        <MudTextField @bind-Value=context.Name Label=@nameof(context.Name)></MudTextField>
+    </MudItem>
+    <MudItem xs="6">
+        <MudTextField @bind-Value=context.Provider Label=@nameof(context.Provider)></MudTextField>
+    </MudItem>
+    <MudItem xs="6">
+        <MudNumericField @bind-Value=context.Fee Label=@nameof(context.Fee)
+                         Adornment=Adornment.Start AdornmentIcon=@Icons.Material.Filled.AttachMoney />
+    </MudItem>
+    <MudItem xs="6">
+        <MudNumericField @bind-Value=context.FeePercentage Label=@nameof(context.FeePercentage)
+                         Adornment=Adornment.Start AdornmentIcon=@Icons.Material.Filled.AttachMoney />
+    </MudItem>
+</BaseCredit>
+
+@code {
+    [Inject]
+    public ISnackbar? Snackbar { get; set; }
+    [Inject]
+    public IPaymentServiceDTOService? PaymentServiceDTOService { get; set; }
+
+    [Parameter]
+    public int? Id { get; set; }
+    Result<PaymentServiceDTO> paymentServiceDTOResult = new();
+
+    async Task<Result<PaymentServiceDTO>> PrepareData()
+    {
+        if (Id is not null) paymentServiceDTOResult = await PaymentServiceDTOService!.GetByIdAsync(Id.Value);
+        else paymentServiceDTOResult = new(new PaymentServiceDTO());
+        return paymentServiceDTOResult;
+    }
+
+    async Task<Result<PaymentServiceDTO>> Submit(PaymentServiceDTO paymentServiceDTO)
+    {
+        Result<PaymentServiceDTO> results;
+        if (Id is null) results = await PaymentServiceDTOService!.CreateAsync(paymentServiceDTO);
+        else results = await PaymentServiceDTOService!.UpdateAsync(paymentServiceDTO);
+        return results.Match(
+            succ => { Snackbar!.Add("Success!!!", Severity.Success); NavigationManager.NavigateTo($"/PaymentService/Details/{succ.Id}"); return results; },
+            fail => { Snackbar!.Add("Error :-)", Severity.Error); return results; }
+        );
+    }
+}

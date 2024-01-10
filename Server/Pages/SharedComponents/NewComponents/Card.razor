@@ -1,0 +1,98 @@
+﻿@inject IDialogService DialogService
+
+<MudCard>
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h6">@Name</MudText>
+            <MudText Typo="Typo.subtitle1">@Type ID: @Id</MudText>
+        </CardHeaderContent>
+    </MudCardHeader>
+    <MudCardContent Class="pt-0">
+        <MudGrid>
+            <MudItem Class="pt-0" xs="12" Style="@("overflow: auto; max-height: 66px; padding-top: 0px;")">
+                <MudField Label="Description" Typo="Typo.body2">@Description</MudField>
+            </MudItem>
+            @if (Info != null && Info.Any())
+            {
+                <MudItem Class="pt-0" xs="12" Style="@("overflow: auto; max-height: 145px; padding-top: 0px;")">
+                    <MudGrid>
+                        @foreach (var info in Info)
+                        {
+                            <MudItem xs="6">
+                                <MudField Label="@info.Key" Typo="Typo.subtitle2"><strong>@info.Value[0]</strong></MudField>
+                            </MudItem>
+                        }
+                    </MudGrid>
+                </MudItem>
+            }
+        </MudGrid>
+    </MudCardContent>
+    <MudCardActions Class="justify-end">
+        <MudTooltip Text="@("Details")" Arrow="true" Placement="Placement.Bottom">
+            <MudIconButton Href="@($"{Link}/Details/{Id}")" Icon="@Icons.Material.Filled.RemoveRedEye" Color="Color.Primary"></MudIconButton>
+        </MudTooltip>
+        <MudTooltip Text="@("Edit")" Arrow="true" Placement="Placement.Bottom">
+            <MudIconButton Href="@($"{Link}/Edit/{Id}")" Icon="@Icons.Material.Filled.Edit" Color="Color.Primary"></MudIconButton>
+        </MudTooltip>
+        @if(DeleteItem.HasDelegate)
+        {
+            <MudTooltip Text="@("Delete")" Arrow="true" Placement="Placement.Bottom">
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error"></MudIconButton>
+            </MudTooltip>
+        }
+    </MudCardActions>
+</MudCard>
+
+
+@code {
+    [Parameter]
+    public int Id {  get; set; }
+    [Parameter]
+    public string Type { get; set; } = string.Empty;
+    [Parameter]
+    public string Name { get; set; } = string.Empty;
+    [Parameter]
+    public string Description { get; set; } = string.Empty;
+    [Parameter]
+    public Dictionary<string, string[]> Info { get; set; } = new();
+    [Parameter]
+    public string Link { get; set; } = string.Empty;
+    [Parameter]
+    public EventCallback<int> DeleteItem { get; set; }
+
+    public List<int> Confirmed { get; set; } = new();
+
+    public void Confirm(int id)
+    {
+        if (!Confirmed.Contains(id))
+        {
+            Confirmed.Add(id);
+        }
+        else
+        {
+            Confirmed.Remove(id);
+        }
+    }
+
+    public async Task Delete(int id)
+    {
+        await DeleteItem.InvokeAsync(id);
+    }
+    public async Task DeleteConfirmation(int id)
+    {
+        var parameters = new DialogParameters();
+        parameters.Add("Header", "Delete");
+        parameters.Add("Content", $"Do you really want to delete this {Type}? This process cannot be undone.");
+        parameters.Add("ButtonText", "Delete");
+        parameters.Add("ButtonColor", Color.Error);
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+
+        var dialog = DialogService.Show<Dialog>($"Delete {Type}", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await Delete(id);
+        }
+    }
+}

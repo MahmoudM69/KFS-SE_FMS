@@ -1,0 +1,25 @@
+﻿@using DataAccess.Models.UserModels;
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Mvc
+@attribute [IgnoreAntiforgeryToken]
+@inject SignInManager<ApplicationUser> SignInManager
+@inject NavigationManager NavManager
+
+@code{
+    [CascadingParameter]
+    public Task<AuthenticationState>? authenticationState { get; set; }
+
+    protected override async void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var authState = await authenticationState!;
+        }
+    }
+    private async void Logout()
+    {
+        var authState = await authenticationState!;
+        if (SignInManager.IsSignedIn(authState.User)) await SignInManager.SignOutAsync();
+        NavManager.NavigateTo("/", true);
+    }
+}

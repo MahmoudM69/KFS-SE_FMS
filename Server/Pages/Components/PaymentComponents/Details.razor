@@ -1,0 +1,39 @@
+﻿@page "/Payment/Details/{Id:int?}"
+@inherits CancellableComponent
+
+<CustomPageTitle PageTypeNumber=2 PageName="Payment"></CustomPageTitle>
+
+<Loading Status=LoadingStatus LoadingTitle="Loading the Payment..." FailedTitle="Error loading the required data"
+         Title="Payment Details" Back="/Payment">
+    <MudPaper>
+        <MudGrid>
+            <MudItem sm="6">
+                <MudDatePicker Label="Payment Start Date" @bind-Date="PaymentDTO!.Date" ReadOnly />
+            </MudItem>
+            <MudItem sm="6">
+                <MudSelect T="PaymentStatus" @bind-Value="PaymentDTO!.Status" ReadOnly >
+                    @foreach (var status in Enum.GetValues(typeof(PaymentStatus)).Cast<PaymentStatus>())
+                    {
+                        <MudSelectItem Value="status">@status.ToString()</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+            <MudItem sm="12">
+                <MudSelect T="int" @bind-Value="PaymentDTO!.PaymentServiceId" ReadOnly >
+                    <MudSelectItem Value="PaymentServiceDTO!.Id">@PaymentServiceDTO.Provider - @PaymentServiceDTO.Name</MudSelectItem>
+                </MudSelect>
+            </MudItem>
+            <MudItem sm="12" Class="d-flex justify-end flex-grow-1 gap-4">
+                @if(PaymentDTO!.SoftDelete <= 0)
+                {
+                    <LoadingButton @ref=SoftDeleteBtn Variant="Variant.Text" Color="Color.Error" OnClick=SoftDelete>Delete Payment</LoadingButton>
+                }
+                else
+                {
+                    <LoadingButton @ref=RecoverBtn Variant="Variant.Text" Color="Color.Warning" OnClick=Recover>Recover Payment</LoadingButton>
+                    <LoadingButton @ref=HardDeleteBtn Variant="Variant.Text" Color="Color.Error" OnClick=Recover>Delete Forever!</LoadingButton>
+                }
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
+</Loading>

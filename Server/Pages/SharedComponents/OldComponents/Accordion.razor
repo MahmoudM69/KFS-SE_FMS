@@ -1,0 +1,93 @@
+﻿<div class="accordion-item border @BorderColor">
+    <input id="@Title.Replace(" ", "-")-@Id" class="hide" type="checkbox" @onchange="Open">
+    <label for="@Title.Replace(" ", "-")-@Id" class="accordion-label">
+        @Title
+        @if (Id >= 0 && ShowDelete)
+        {
+            <a @onclick="() => DeleteItem(Id)" class="btn btn-outline-danger border float-end" style="margin-right: 10px;" title="Delete @Title">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                    <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"></path>
+                </svg>
+            </a>
+        }
+        else
+        {
+            if (ShowCopy)
+            {
+                <a @onclick="CopyItem" class="btn btn-light input-group-text float-end" style="margin-right: 10px; border: solid 1px #ced4da;" title="Copy to All">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-files" viewBox="0 0 16 16">
+                        <path d="M13 0H6a2 2 0 0 0-2 2 2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2 2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm0 13V4a2 2 0 0 0-2-2H5a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1zM3 4a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4z"></path>
+                    </svg>
+                </a>
+            }
+        }
+    </label>
+    <div class="accordion-child border border-@BorderColor">
+        @Content
+    </div>
+</div>
+
+@code{
+    [Parameter]
+    public int Id { get; set; }
+    [Parameter]
+    public string Title { get; set; } = string.Empty;
+    [Parameter]
+    public int StatePram { get; set; } = 0;
+    public int State { get; set; } = 0;
+    [Parameter]
+    public RenderFragment? Content { get; set; }
+    [Parameter]
+    public EventCallback<int> Delete { get; set; }
+    public bool ShowDelete { get; set; } = false;
+    [Parameter]
+    public EventCallback Copy { get; set; }
+    public bool ShowCopy { get; set; } = false;
+
+    public string BorderColor { get; set; } = "border-primary";
+
+    protected override Task OnParametersSetAsync()
+    {
+        if (Delete.HasDelegate) ShowDelete = true;
+        if (Copy.HasDelegate) ShowCopy = true;
+        State = StatePram;
+        ChangeBorder();
+        return base.OnParametersSetAsync();
+    }
+
+    public async Task DeleteItem(int id)
+    {
+        if (Delete.HasDelegate) await Delete.InvokeAsync(id);
+    }
+
+    public async Task CopyItem()
+    {
+        if (Copy.HasDelegate) await Copy.InvokeAsync();
+    }
+
+    public void Open()
+    {
+        if(State == 0) State = 1;
+        ChangeBorder();
+    }
+
+    public void ChangeBorder()
+    {
+        if (State == 0)
+        {
+            BorderColor = "border-primary";
+        }
+        else if (State == 1)
+        {
+            BorderColor = "border-secondary";
+        }
+        else if (State == 2)
+        {
+            BorderColor = "border-success";
+        }
+        else
+        {
+            BorderColor = "border-danger";
+        }
+    }
+}

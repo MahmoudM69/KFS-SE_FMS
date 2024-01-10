@@ -1,0 +1,100 @@
+﻿@if(Items != null && Items.Any())
+{
+    <MudGrid>
+        <MudItem xs="12">
+            <MudPaper>
+                <MudList Clickable="true">
+                    @foreach(var item in Items)
+                    {
+                        <MudListItem Icon="@Icons.Material.Filled.Send">
+                            <MudText Typo="Typo.body1">@item.Value</MudText>
+                            @if (viewBtn)
+                            {
+                                <MudIconButton OnClick="() => View(item.Key)" Icon="@Icons.Material.Filled.RemoveRedEye" aria-label="up" style="float: right; padding-top: 0px; padding-bottom: 0px;"></MudIconButton>
+                            }
+                            @if (editBtn)
+                            {
+                                <MudIconButton OnClick="() => Edit(item.Key)" Icon="@Icons.Material.Filled.ModeEdit" aria-label="up" style="float: right; padding-top: 0px; padding-bottom: 0px;"></MudIconButton>
+                            }
+                            @if (deleteBtn)
+                            {
+                                <MudIconButton OnClick="() => Delete(item.Key)" Icon="@Icons.Material.Filled.Delete" aria-label="up" style="float: right; padding-top: 0px; padding-bottom: 0px;"></MudIconButton>
+                            }
+                            <MudButtonGroup Size="Size.Small" Color="Color.Primary" style="float: right;">
+                                @if(upBtn && !(Items.First().Key == item.Key))
+                                {
+                                    <MudIconButton OnClick="() => Up(item.Key)" Icon="@Icons.Material.Filled.ArrowUpward" aria-label="up" style="padding-top: 0px; padding-bottom: 0px;"></MudIconButton>
+                                }
+                                @if(downBtn && !(Items.Last().Key == item.Key))
+                                {
+                                    <MudIconButton OnClick="() => Down(item.Key)" Icon="@Icons.Material.Filled.ArrowDownward" aria-label="down" style="padding-top: 0px; padding-bottom: 0px;"></MudIconButton>
+                                }
+                            </MudButtonGroup>
+                        </MudListItem>
+                    }
+                </MudList>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+}
+
+@code
+{
+    [CascadingParameter]
+    public Dictionary<int, string> Items { get; set; } = new();
+
+    [Parameter]
+    public EventCallback<int> Viewable { get; set; }
+
+    [Parameter]
+    public EventCallback<int> Editable { get; set; }
+
+    [Parameter]
+    public EventCallback<int> Deletable { get; set; }
+
+    [Parameter]
+    public EventCallback<int> MoveUp { get; set; }
+
+    [Parameter]
+    public EventCallback<int> MoveDown { get; set; }
+
+    private bool viewBtn = false;
+    private bool editBtn = false;
+    private bool deleteBtn = false;
+    private bool upBtn = false;
+    private bool downBtn = false;
+
+    protected override void OnParametersSet()
+    {
+        if (Viewable.HasDelegate) viewBtn = true;
+        if (Editable.HasDelegate) editBtn = true;
+        if (Deletable.HasDelegate) deleteBtn = true;
+        if (MoveUp.HasDelegate) upBtn = true;
+        if (MoveUp.HasDelegate) downBtn = true;
+    }
+
+    private async Task View(int id)
+    {
+        if (viewBtn) await Viewable.InvokeAsync(id);
+    }
+
+    private async Task Edit(int id)
+    {
+        if (editBtn) await Editable.InvokeAsync(id);
+    }
+
+    private async Task Delete(int id)
+    {
+        if (deleteBtn) await Deletable.InvokeAsync(id);
+    }
+
+    private async Task Up(int id)
+    {
+        if (upBtn) await MoveUp.InvokeAsync(id);
+    }
+
+    private async Task Down(int id)
+    {
+        if (downBtn) await MoveDown.InvokeAsync(id);
+    }
+}

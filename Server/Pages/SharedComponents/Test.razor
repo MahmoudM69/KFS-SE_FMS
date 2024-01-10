@@ -1,0 +1,159 @@
+﻿@page "/Test"
+@using Bogus;
+@using Server.Pages.SharedComponents.NewComponents.BaseComponents
+
+<BaseToolBar Label="Test" LabelIcon=@Icons.Material.Rounded.List
+             Items=@Items.ToDictionary(x => x.Key, x => x.Value.Item1) SelectedItems=@SelectedItems.ToDictionary(x => x.Key, x => x.Value.Item1)
+             Refresh=@(_ => { Refresh(); StateHasChanged(); }) ItemModeChanged=@ChangeItemMode ViewStyleChanged=@ChangeViewStyle
+             SearchFunc=@Search CreateFunc=@Create
+             EditFunc=@(id => Details((int)id))
+             DetailsFunc=@(id => Details((int)id))
+             SoftDeleteFunc=@(ids => SoftDelete(ids.Cast<int>()))
+             RecoverFunc=@(ids => Recover(ids.Cast<int>()))
+             HardDeleteFunc=@(ids => HardDelete(ids.Cast<int>())) />
+
+<br />
+<br />
+<br />
+
+<p>Some example text..</p>
+<h2>Scroll back up again to "remove" the sticky position.</h2>
+
+<br />
+<br />
+<br />
+
+<MudGrid>
+    @foreach (var item in Items)
+    {
+        <MudItem lg=4 sm=6 xs=12 Class="rounded-lg pa-2">
+            <MudCard Class="rounded-lg"
+                     Style=@(SelectedItems.Contains(item) ? item.Key.Item2 == 0 ? "outline: dashed 2px rgba(119,107,231,1);" : "outline: dashed 2px rgba(244,67,54,1);" : string.Empty)
+                     @onclick=@((_) =>
+                     {
+                         if(SelectedItems.Contains(item)) SelectedItems.Remove(item.Key);
+                         else SelectedItems.Add(item.Key, item.Value);
+                     })>
+                <MudCardHeader>
+                    <CardHeaderAvatar>
+                        <MudAvatar Color="Color.Secondary">I</MudAvatar>
+                    </CardHeaderAvatar>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.body1">@item.Value.Item1</MudText>
+                        <MudText Typo="Typo.body2">@item.Value.Item2</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Default" />
+                    </CardHeaderActions>
+                </MudCardHeader>
+                <MudCardMedia Image="https://planetofhotels.com/guide/sites/default/files/styles/node__blog_post__bp_banner/public/2021-02/Colmar-Old-Town.jpg" Height="250" />
+                <MudCardContent Class="overflow-auto" Style="height: 100px;">
+                    <MudText Typo="Typo.body2">@item.Value.Item3</MudText>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudIconButton Icon="@Icons.Material.Filled.Favorite" Color="Color.Default" />
+                    <MudIconButton Icon="@Icons.Material.Filled.Share" Color="Color.Default" />
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    }
+</MudGrid>
+
+@code{
+    Dictionary<(object, int), (string, string, string)> _items = new();
+    Dictionary<(object, int), (string, string, string)> Items = new();
+    Dictionary<(object, int), (string, string, string)> SelectedItems = new();
+    ItemMode itemMode = ItemMode.Normal;
+
+    Dictionary<(object, int), (string, string, string)> GetItems(ItemMode? mode = null)
+    {
+        mode ??= itemMode;
+        return mode switch
+        {
+            ItemMode.Normal => _items.Where(x => x.Key.Item2 == 0).ToDictionary(x => x.Key, x => x.Value),
+            ItemMode.Deleted => _items.Where(x => x.Key.Item2 == -1).ToDictionary(x => x.Key, x => x.Value),
+            _ => _items
+        };
+    }
+
+    protected override void OnInitialized()
+    {
+        Refresh();
+        base.OnInitialized();
+    }
+
+    public Task Refresh()
+    {
+        _items = new();
+
+        Faker faker = new();
+        for (int i = 1; i <= 10; i++)
+        {
+            (int id, int softDelete) key = (i, faker.Random.Number(-1, 0));
+            (string city, string country, string paragraph) value =
+                ((key.softDelete == -1) ? $"(Deleted) {faker.Address.City()}" : faker.Address.City(), faker.Address.Country(), faker.Lorem.Paragraph());
+            _items.Add(key, value);
+        }
+        Items = GetItems(ItemMode.Normal);
+
+        return Task.CompletedTask;
+    }
+
+    public Task ChangeItemMode(ItemMode mode)
+    {
+        itemMode = mode;
+        Items = GetItems();
+        SelectedItems = new();
+        StateHasChanged();
+
+        return Task.CompletedTask;
+    }
+
+    public void ChangeViewStyle(bool style) { }
+
+    public Task Create()
+    {
+        return Task.CompletedTask;
+    }
+
+    public Task Details(int id)
+    {
+        return Task.CompletedTask;
+    }
+
+    public Task Edit(int id)
+    {
+        return Task.CompletedTask;
+    }
+
+    public Task SoftDelete(IEnumerable<int> ids)
+    {
+        return Task.CompletedTask;
+    }
+
+    public Task Recover(IEnumerable<int> ids)
+    {
+        return Task.CompletedTask;
+    }
+
+    public Task HardDelete(IEnumerable<int> ids)
+    {
+        return Task.CompletedTask;
+    }
+
+    public async Task<IEnumerable<string>> Search(string value)
+    {
+        await Task.Delay(1);
+
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            Items = GetItems();
+            StateHasChanged();
+            return Items.Values.Select(x => x.Item1);
+        }
+
+        Items = GetItems().Where(x => x.Value.Item1.Contains(value, StringComparison.InvariantCultureIgnoreCase)).ToDictionary(x => x.Key, x => x.Value);
+        StateHasChanged();
+        return Items.Select(x => x.Value.Item1);
+    }
+}

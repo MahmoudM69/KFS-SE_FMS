@@ -1,0 +1,33 @@
+﻿@namespace Server.Pages.Components.BaseComponents
+@inherits CancellableComponent
+@typeparam T
+
+<CustomPageTitle PageTypeNumber="@(IsEdit ? 3 : 4)" PageName=@EntityName></CustomPageTitle>
+
+<Loading Status=_loadingStatus LoadingTitle=@($"Loading the {EntityName}...") FailedTitle="Error loading the required data"
+         Title=@(IsEdit ? $"Edit the {EntityName}" : $"Create the {EntityName}") Back=@($"/{EntityName}")>
+    <MudPaper Class=@ContainerClass Style=@ContainerStyle >
+        @if (ChildContent is not null)
+        {
+            <EditForm Model="_dto" OnValidSubmit="SubmitEntity">
+                @*<DataAnnotationsValidator />*@
+                <FluentValidationValidator />
+                <ValidationSummary />
+                <MudGrid>
+                    @ChildContent(_dto!)
+
+                    <MudItem sm="12" Class=@ActionBtnContainerClass Style=@ActionBtnContainerStyle>
+                        <LoadingButton @ref=_submit ButtonType=ButtonType.Submit Variant=Variant.Text Color=Color.Primary
+                                       Class=@ActionBtnClass Style=@ActionBtnStyle>
+                            @(IsEdit ? "Edit" : "Create") @EntityName.Titleize()
+                        </LoadingButton>
+                        <LoadingButton @ref=_reset ButtonType=ButtonType.Reset Variant=Variant.Text Color=Color.Primary OnClick=ResetEntity
+                                       Class=@ActionBtnClass Style=@ActionBtnStyle>
+                            Reset @EntityName.Titleize()
+                        </LoadingButton>
+                    </MudItem>
+                </MudGrid>
+            </EditForm>
+        }
+    </MudPaper>
+</Loading>

@@ -1,0 +1,14 @@
+﻿<MudTooltip IsVisible="@ShowToolTip" Duration="Duration" Text="@Text" Arrow="Arrow" ShowOnClick="false" ShowOnFocus="false" ShowOnHover="false">
+    <ChildContent>
+        <MudItem @onmouseover="(e => MouseOnItem())" @onmouseout="(e => MouseOutItem())">
+            @Item
+        </MudItem>
+    </ChildContent>
+    <TooltipContent>
+        <MudItem>
+        </MudItem>
+        <MudItem @onmouseover="(e => MouseOn())" @onmouseout="(e => MouseOut())">
+            @Tip
+        </MudItem>
+    </TooltipContent>
+</MudTooltip>

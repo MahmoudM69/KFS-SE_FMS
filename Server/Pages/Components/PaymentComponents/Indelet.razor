@@ -1,0 +1,37 @@
+﻿@page "/Payment/"
+@page "/Payment/Index"
+@page "/Payment/Deleted"
+@page "/Payment/All"
+@page "/Payment/PaymentService/{PaymentServiceId:int?}"
+@page "/Payment/Deleted/PaymentService/{PaymentServiceId:int?}"
+@page "/Payment/All/PaymentService/{PaymentServiceId:int?}"
+@inherits CancellableComponent
+
+<CustomPageTitle></CustomPageTitle>
+
+@Icons.Material.Rounded.ViewList
+@Icons.Material.Rounded.ViewModule
+
+<MudPaper Elevation="25">
+    <MudToolBar>
+        <MudIconButton Icon="@Icons.Material.Outlined.Menu" Color="Color.Inherit" Class="mr-5" />
+        <MudIconButton Icon="@Icons.Material.Outlined.Add" />
+        <MudIconButton Icon="@Icons.Material.Outlined.Edit" />
+        <MudIconButton Icon="@Icons.Material.Outlined.Remove" Color="Color.Inherit" />
+        <MudIconButton Icon="@Icons.Material.Outlined.Settings" Color="Color.Inherit" />
+        <MudSpacer />
+
+        <MudToggleIconButton @bind-Toggled="@AlarmOn"
+                             Icon="@Icons.Material.Rounded.ViewList" Title="List"
+                             ToggledIcon="@Icons.Material.Rounded.ViewModule" ToggledTitle="Cards" />
+
+        <MudIconButton Icon="@Icons.Material.Outlined.Notifications" />
+        <MudIconButton Icon="@Icons.Material.Outlined.PushPin" />
+        <MudIconButton Icon="@Icons.Material.Outlined.PeopleAlt" />
+        <MudIconButton Icon="@Icons.Material.Outlined.MoreVert" Color="Color.Inherit" />
+    </MudToolBar>
+</MudPaper>
+
+@code {
+    bool AlarmOn;
+}

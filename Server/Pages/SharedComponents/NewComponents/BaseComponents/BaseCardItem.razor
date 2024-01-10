@@ -1,0 +1,119 @@
+﻿@inherits BaseItemComponent
+
+<MudCard @attributes=ContainerAttributes >
+    @if (HeaderContent is not null)
+    {
+        <MudCardHeader>
+            @HeaderContent
+        </MudCardHeader>
+    }
+
+    @if (showImage)
+    {
+        if (ImagesSrc.Count() == 1)
+        {
+            <MudCardMedia Image=@ImagesSrc.FirstOrDefault() @attributes=ImageAttributes />
+        }
+        else
+        {
+            <MudCarousel @attributes=ImageContainerAttributes TData=object ShowArrows=true
+                         ShowBullets=false EnableSwipeGesture=true AutoCycle=CarouselAutoCycle >
+                @foreach (var imagesSrc in ImagesSrc)
+                {
+                    <MudCarouselItem Transition=Transition.Fade>
+                        @if (string.IsNullOrWhiteSpace(ImageLink))
+                        {
+                            <div style="height:100%">
+                                <MudImage Src=@imagesSrc @attributes=ImageAttributes />
+                            </div>
+                        }
+                        else
+                        {
+                            <MudLink Href=@ImageLink Style="height:100%">
+                                <MudImage Src=@imagesSrc @attributes=ImageAttributes />
+                            </MudLink>
+                        }
+                    </MudCarouselItem>
+                }
+            </MudCarousel>
+        }
+    }
+
+    <MudCardContent @attributes=ContentAttributes>
+        @ChildContent
+    </MudCardContent>
+
+    @if (ActionContent is not null)
+    {
+        <MudCardActions>
+            @ActionContent
+        </MudCardActions>
+    }
+    else if (showDefaultButton)
+    {
+        <MudCardActions>
+            <div @attributes=ActionContainerAttributes>
+                @*@if (DetailsClicked.HasDelegate)
+                {
+                    <MudButton StartIcon=@Icons.Material.Rounded.RemoveRedEye Variant="Variant.Text" Color="Color.Inherit"
+                    FullWidth="true" Class=@DefaultActionBtnsClass>Details</MudButton>
+                }
+                @if (EditClicked.HasDelegate)
+                {
+                    <MudButton StartIcon=@Icons.Material.Rounded.Edit Variant="Variant.Text" Color="Color.Inherit"
+                    FullWidth="true" Class=@DefaultActionBtnsClass>Edit</MudButton>
+                }
+                @if (RecoverClicked.HasDelegate)
+                {
+                    <MudButton StartIcon=@Icons.Material.Rounded.Undo Variant="Variant.Text" Color="Color.Inherit"
+                    FullWidth="true" Class=@DefaultActionBtnsClass>Recover</MudButton>
+                }
+                @if (DeleteClicked.HasDelegate)
+                {
+                    <MudButton StartIcon=@Icons.Material.Rounded.Delete Variant="Variant.Text" Color="Color.Error"
+                    FullWidth="true" Class=@DefaultActionBtnsClass>Delete</MudButton>
+                }
+                @if (DeleteForeverClicked.HasDelegate)
+                {
+                    <MudButton StartIcon=@Icons.Material.Rounded.DeleteForever Variant="Variant.Text" Color="Color.Error"
+                    FullWidth="true" Class=@DefaultActionBtnsClass>Delete Forever</MudButton>
+                }*@
+                @if (DetailsClicked.HasDelegate)
+                {
+                    <MudTooltip Text="Details" Arrow=true>
+                        <MudIconButton @attributes=ActionAttributes Icon=@Icons.Material.Rounded.RemoveRedEye
+                                       OnClick=DetailsClicked aria-label="Details" />
+                    </MudTooltip>
+                }
+                @if (EditClicked.HasDelegate)
+                {
+                    <MudTooltip Text="Edit" Arrow=true>
+                        <MudIconButton @attributes=ActionAttributes Icon=@Icons.Material.Rounded.Edit
+                                       OnClick=EditClicked aria-label="Edit" />
+                    </MudTooltip>
+                }
+                @if (RecoverClicked.HasDelegate)
+                {
+                    <MudTooltip Text="Recover" Arrow=true>
+                        <MudIconButton @attributes=ActionAttributes Icon=@Icons.Material.Rounded.Undo
+                                       OnClick=RecoverClicked aria-label="Recover" />
+                    </MudTooltip>
+                }
+                @if (DeleteClicked.HasDelegate)
+                {
+                    <MudTooltip Text="Delete" Arrow=true>
+                        <MudIconButton @attributes=ActionAttributes Icon=@Icons.Material.Rounded.Delete
+                                       Color=Color.Error OnClick=DeleteClicked aria-label="Delete" />
+                    </MudTooltip>
+                }
+                @if (DeleteForeverClicked.HasDelegate)
+                {
+                    <MudTooltip Text="Delete Forever" Arrow=true>
+                        <MudIconButton @attributes=ActionAttributes Icon=@Icons.Material.Rounded.DeleteForever
+                                       Color=Color.Error OnClick=DeleteForeverClicked aria-label="Delete-Forever" />
+                    </MudTooltip>
+                }
+            </div>
+        </MudCardActions>
+    }
+</MudCard>

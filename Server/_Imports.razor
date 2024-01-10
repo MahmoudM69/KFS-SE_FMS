@@ -1,4 +1,13 @@
-﻿@using System.Net.Http
+﻿@using global::Common.Classes;
+@using global::Common.Enums;
+@using global::Common.Exceptions;
+@using Blazored.FluentValidation
+@using Business.IServices.IPaymentServices;
+@using DTO.DTOs.OrderDTOs
+@using DTO.DTOs.PaymentDTOs
+@using Humanizer;
+@using LanguageExt;
+@using LanguageExt.Common;
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Forms
@@ -6,5 +15,11 @@
 @using Microsoft.AspNetCore.Components.Web
 @using Microsoft.AspNetCore.Components.Web.Virtualization
 @using Microsoft.JSInterop
+@using MudBlazor
 @using Server
+@using Server.Helpers.Extensions;
+@using System.Net.Http
+@using Server.Pages.Components.BaseComponents
+@using Server.Pages.SharedComponents.NewComponents;
+@using Server.Pages.SharedComponents.NewComponents.BaseComponents
 @using Server.Shared

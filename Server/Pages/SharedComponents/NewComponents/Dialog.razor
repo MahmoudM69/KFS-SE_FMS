@@ -1,0 +1,33 @@
+﻿<MudDialog>
+    <DialogContent>
+        <MudCard>
+            <MudCardHeader>
+                <MudText>@Header</MudText>
+            </MudCardHeader>
+            <MudCardContent>
+                @Content
+            </MudCardContent>
+        </MudCard>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Inherit" Variant="Variant.Filled" OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="@ButtonColor" Variant="Variant.Filled" OnClick="Submit">@ButtonText</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    MudDialogInstance? ThisDialog { get; set; }
+    
+    [Parameter]
+    public string Header { get; set; } = string.Empty;
+    [Parameter]
+    public string Content { get; set; } = string.Empty;
+    [Parameter]
+    public string ButtonText { get; set; } = string.Empty;
+    [Parameter]
+    public Color ButtonColor { get; set; }
+
+    void Submit() => ThisDialog!.Close<bool>(true);
+    void Cancel() => ThisDialog!.Cancel();
+}

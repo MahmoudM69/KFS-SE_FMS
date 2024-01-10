@@ -1,0 +1,143 @@
+﻿<MudPaper Elevation=5 Class=@(isPinned ? "sticky rounded-lg z-10" : "rounded-lg z-10") Style="top: 70px">
+    <MudToolBar WrapContent=true Style="min-height: 0px;">
+        <MudGrid Class="pa-4">
+            <MudItem sm=6 xs=12 Class="d-flex d-flex flex-grow-1 align-center pa-0 gap-4">
+                <MudTooltip Text="Back" Arrow=true>
+                    <MudIconButton Icon=@Icons.Material.Rounded.ArrowBack Disabled=@(!HistoryState!.CanGoBack()) OnClick=@(_ => HistoryState!.NavigateBack()) />
+                </MudTooltip>
+                <MudTooltip Text="History" Arrow=true>
+                    <MudMenu Disabled=@(!History.Any()) ActivationEvent=MouseEvent.LeftClick AnchorOrigin=Origin.BottomCenter TransformOrigin=Origin.TopCenter MaxHeight=200>
+                        <ActivatorContent>
+                            <MudIconButton Icon=@Icons.Material.Rounded.ArrowDropDown Size=Size.Small />
+                        </ActivatorContent>
+                        <ChildContent>
+                            @foreach (var oldPage in History)
+                            {
+                                <MudMenuItem Disabled=@(HistoryState!.navigationManager.Uri.Replace(HistoryState.navigationManager.BaseUri, "/") == oldPage.Key)
+                                             OnClick=@(_ => HistoryState!.NavigateFromHistory(oldPage))>@oldPage.Value</MudMenuItem>
+                            }
+                        </ChildContent>
+                    </MudMenu>
+                </MudTooltip>
+                <MudTooltip Text="Up" Arrow=true>
+                    <MudIconButton Icon=@Icons.Material.Rounded.ArrowUpward Size=Size.Small Disabled=@(!HistoryState!.CanGoUp()) OnClick=@(_ => HistoryState!.NavigateUp()) />
+                </MudTooltip>
+                @if(LabelContent != null)
+                {
+                    @LabelContent
+                }
+                else
+                {
+                    <MudChip Class="flex-auto" Icon=@LabelIcon Color=@LabelColor>@Label</MudChip>
+                }
+            </MudItem>
+
+            <MudSpacer />
+
+            <MudItem sm=5 xs=12 Class="d-flex justify-space-around align-center pa-0">
+                @if (Refresh.HasDelegate)
+                {
+                    <MudTooltip Text="Refresh" Arrow=true>
+                        <MudIconButton Icon=@Icons.Material.Rounded.Refresh OnClick=Refresh />
+                    </MudTooltip>
+                }
+                @if (ViewStyleChanged != null)
+                {
+                    <MudTooltip Text=@((ViewStyle)? "Card View" : "List View")>
+                        <MudToggleIconButton Toggled=ViewStyle ToggledChanged=@((style) => {ViewStyle = style; ViewStyleChanged(ViewStyle);})
+                                             Icon=@Icons.Material.Rounded.ViewList ToggledIcon=@Icons.Material.Rounded.ViewModule />
+                    </MudTooltip>
+                }
+                @if (ItemModeChanged != null)
+                {
+                    <MudTooltip Text=@((ItemMode == ItemMode.Normal)? "Normal" : (ItemMode == ItemMode.Deleted)? "Deleted": "All")>
+                        <MudIconButton OnClick=@ChangeItemMode Icon=@modeBtnIcon />
+                    </MudTooltip>
+                }
+                @if (AdvancedContent != null || SearchFunc != null || showFuncs)
+                {
+                    <MudTooltip Text=@(showAdvanced ? "Less Options" : "More Options") Arrow=true>
+                        <MudToggleIconButton Disabled=@(!(AdvancedContent != null || SearchFunc != null || showFuncs)) @bind-Toggled=@showAdvanced
+                                             Icon=@Icons.Material.Filled.MoreVert Title="More Options"
+                                             ToggledIcon=@Icons.Material.Filled.MoreHoriz ToggledTitle="Less Options"/>
+                    </MudTooltip>
+                }
+                <MudTooltip Text=@(isPinned ? "Pinned" : "Fixed") Arrow=true>
+                    <MudToggleIconButton @bind-Toggled=@isPinned
+                                         Icon=@Icons.Material.Outlined.PushPin Title="Fixed"
+                                         ToggledIcon=@Icons.Material.Filled.PushPin ToggledTitle="Pinned" />
+                </MudTooltip>
+            </MudItem>
+        </MudGrid>
+
+        <MudPopover Open=@showAdvanced OverflowBehavior=OverflowBehavior.FlipAlways AnchorOrigin=Origin.BottomCenter TransformOrigin=Origin.TopCenter Paper=false RelativeWidth=true>
+            <MudPaper Elevation=5 Class="rounded-lg px-6 py-4">
+                @if (AdvancedContent != null)
+                {
+                    @AdvancedContent
+                }
+                else if (SearchFunc != null || showFuncs)
+                {
+                    <MudGrid>
+                        @if (SearchFunc != null)
+                        {
+                            <MudItem sm=@(showFuncs ? 7 : 12) xs=12 Class="pa-0">
+                                <MudAutocomplete T=string Label=@SearchLabel Value=@SearchValue ValueChanged=@SearchFunc SearchFunc=@SearchFunc
+                                                 Variant=Variant.Outlined Margin=Margin.Dense Dense=true AdornmentIcon=@searchIcon
+                                                 ResetValueOnEmptyText=true CoerceText=false CoerceValue=true />
+                            </MudItem>
+                            <MudSpacer />
+                        }
+                        @if (showFuncs)
+                        {
+                            <MudItem sm=@((SearchFunc is not null) ? 4 : 12) xs=12 Class="d-flex justify-space-around pa-0">
+                                @if (SoftDeleteFunc != null && SelectedItems.Any() && SelectedItems.Select(x => x.Key.Item2).All(x => x >= 0))
+                                {
+                                    <MudTooltip Text="Delete" Arrow=true>
+                                        <MudIconButton Disabled=@(!SelectedItems.Any()) OnClick=@(async _ => await SoftDeleteFunc(SelectedItems.Select(x => x.Key.Item1)))
+                                                       Icon=@(SelectedItems.Any() ? Icons.Material.Filled.Delete : Icons.Material.Outlined.Delete) />
+                                    </MudTooltip>
+                                }
+                                @if (HardDeleteFunc != null && SelectedItems.Any() && SelectedItems.Select(x => x.Key.Item2).All(x => x < 0))
+                                {
+                                    <MudTooltip Text="Delete Forever" Arrow=true>
+                                        <MudIconButton Disabled=@(!SelectedItems.Any()) OnClick=@(async _ => await HardDeleteFunc(SelectedItems.Select(x => x.Key.Item1)))
+                                                       Icon=@(SelectedItems.Any() ? @Icons.Material.Filled.DeleteForever : Icons.Material.Outlined.DeleteForever) />
+                                    </MudTooltip>
+                                }
+                                @if (RecoverFunc != null && SelectedItems.Any() && SelectedItems.Select(x => x.Key.Item2).All(x => x < 0))
+                                {
+                                    <MudTooltip Text="Recover" Arrow=true>
+                                        <MudIconButton Disabled=@(!SelectedItems.Any()) Icon=@Icons.Material.Rounded.Undo
+                                                       OnClick=@(async _ => await RecoverFunc(SelectedItems.Select(x => x.Key.Item1))) />
+                                    </MudTooltip>
+                                }
+                                @if (EditFunc != null)
+                                {
+                                    <MudTooltip Text="Edit" Arrow=true>
+                                        <MudIconButton Disabled=@(SelectedItems.Count != 1) Icon=@(SelectedItems.Count == 1 ? Icons.Material.Filled.Edit : Icons.Material.Outlined.Edit)
+                                                       OnClick=@(async _ => {if(SelectedItems.Count == 1) await EditFunc(SelectedItems.FirstOrDefault().Key.Item1);}) />
+                                    </MudTooltip>
+                                }
+                                @if (DetailsFunc != null)
+                                {
+                                    <MudTooltip Text="Details" Arrow=true>
+                                        <MudIconButton Disabled=@(SelectedItems.Count != 1)
+                                                       Icon=@(SelectedItems.Count == 1 ? Icons.Material.Filled.RemoveRedEye : Icons.Material.Outlined.RemoveRedEye)
+                                                       OnClick=@(async _ => {if(SelectedItems.Count == 1) await DetailsFunc(SelectedItems.FirstOrDefault().Key.Item1);}) />
+                                    </MudTooltip>
+                                }
+                                @if (CreateFunc != null)
+                                {
+                                    <MudTooltip Text="Create" Arrow=true>
+                                        <MudIconButton Icon=@Icons.Material.Rounded.Add OnClick=CreateFunc />
+                                    </MudTooltip>
+                                }
+                            </MudItem>
+                        }
+                    </MudGrid>
+                }
+            </MudPaper>
+        </MudPopover>
+    </MudToolBar>
+</MudPaper>

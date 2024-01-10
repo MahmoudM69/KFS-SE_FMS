@@ -1,0 +1,25 @@
+﻿@namespace Server.Pages.Components.BaseComponents
+@inherits CancellableComponent
+@typeparam T
+@using Server.Pages.SharedComponents.NewComponents.BaseComponents
+
+@*<CustomPageTitle PageTypeNumber="@((Id != null)? 3 : 4)" PageName=@EntityName></CustomPageTitle>*@
+<PageTitle>
+    @((itemMode == ItemMode.Normal) ? $"{EntityName} List" :
+           (itemMode == ItemMode.Deleted) ? $"Deleted {EntityName.Pluralize()}" :
+                $"All {EntityName.Pluralize()}")
+</PageTitle>
+
+@*<IndexToolsButton Values=DTONames ViewStyleChangedEvent=ViewStyleChangedEvent CreateEvent=Create!
+                  Search=@(Search is not null ? Search : default!)
+                  RefreshEvent=@((Prepare != null)? async () => await PrepareEntity(itemMode, true) : default(Action)!)
+                  ViewItemModeChangedEvent=@((Prepare != null)? async (mode) => await PrepareEntity(mode, true) : default(Action<ItemMode>)!) />*@
+<Loading Status=_loadingStatus LoadingTitle=@($"Loading the {EntityName.Pluralize()}...") FailedTitle="Error loading the required data"
+            Title=@((itemMode == ItemMode.Normal)? $"{EntityName} List" :
+                   (itemMode == ItemMode.Deleted)? $"Deleted {EntityName.Pluralize()}" :
+                                                       $"All {EntityName.Pluralize()}")>
+    @if (ChildContent is not null && _dtos is not null)
+    {
+        @ChildContent(_dtos)
+    }
+</Loading>

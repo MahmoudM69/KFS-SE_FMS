@@ -1,0 +1,45 @@
+﻿@page "/Payment/Create"
+@page "/Payment/Edit/{Id:int?}"
+@inherits CancellableComponent
+
+<CustomPageTitle PageTypeNumber="@((Id != null)? 3 : 4)" PageName="Payment"></CustomPageTitle>
+
+<Loading Status=LoadingStatus LoadingTitle="Loading the Payment..." FailedTitle="Error loading the required data" 
+         Title=@((Id != null)? "Edit the Payment" : "Create the Payment") Back="/Payment">
+    <MudPaper>
+        <EditForm Model=PaymentDTO>
+            <DataAnnotationsValidator />
+            <FluentValidationValidator />
+            <ValidationSummary />
+            <MudGrid>
+                <MudItem sm="6">
+                    <MudDatePicker Label="Payment Start Date" @bind-Date="PaymentDTO!.Date" />
+                </MudItem>
+                <MudItem sm="6">
+                    <MudSelect T="PaymentStatus" @bind-Value="PaymentDTO!.Status">
+                        @foreach (var status in Enum.GetValues(typeof(PaymentStatus)).Cast<PaymentStatus>())
+                        {
+                            <MudSelectItem Value="status">@status.ToString()</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+                <MudItem sm="12">
+                    <MudSelect T="int" @bind-Value="PaymentDTO!.PaymentServiceId">
+                        @foreach (var paymentServiceDTO in PaymentServiceDTOs!)
+                        {
+                            <MudSelectItem Value="paymentServiceDTO.Id">@paymentServiceDTO.Provider - @paymentServiceDTO.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+                <MudItem sm="12" Class="d-flex justify-end flex-grow-1 gap-4">
+                    <LoadingButton @ref=Submit Variant="Variant.Text" Color="Color.Primary" OnClick=Submitting>
+                        @((Id == null) ? "Create" : "Edit") Payment
+                    </LoadingButton>
+                    <LoadingButton @ref=Reset Variant="Variant.Text" Color="Color.Primary" OnClick=Resetting>
+                        Reset Payment
+                    </LoadingButton>
+                </MudItem>
+            </MudGrid>
+        </EditForm>
+    </MudPaper>
+</Loading>

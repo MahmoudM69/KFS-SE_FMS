@@ -1,0 +1,116 @@
+﻿<MudListItem Value="Value" Class="@Class">
+    @if(ItemId != null)
+    {
+        <MudText style="display: contents;" Typo="Typo.subtitle1"><span Class='mud-text-disabled'>@ItemId | </span>@ItemName</MudText>
+    }
+    else
+    {
+        <MudText style="display: contents;" Typo="Typo.subtitle1">@ItemName</MudText>
+    }
+
+    @if(UpDown)
+    {
+        <MudButtonGroup Size="Size.Small" Color="Color.Primary" style="float: right;">
+            <MudTooltip Text="@((upBtn)? "Up" : "Disabled")" Arrow="true" Placement="Placement.Bottom">
+                <MudIconButton Disabled="!upBtn" OnClick="Up" Icon="@Icons.Material.Filled.ArrowUpward" aria-label="up" style="padding-top: 0px; padding-bottom: 0px;"></MudIconButton>
+            </MudTooltip>
+            <MudTooltip Text="@((downBtn)? "Down" : "Disabled")" Arrow="true" Placement="Placement.Bottom">
+                <MudIconButton Disabled="!downBtn" OnClick="Down" Icon="@Icons.Material.Filled.ArrowDownward" aria-label="down" style="padding-top: 0px; padding-bottom: 0px;"></MudIconButton>
+            </MudTooltip>
+        </MudButtonGroup>
+    }
+    <MudButtonGroup Size="Size.Small" Color="Color.Primary" style="float: right;">
+        @if (viewBtn)
+        {
+            <MudTooltip Text="@("View")" Arrow="true" Placement="Placement.Bottom">
+                <MudIconButton OnClick="View" Icon="@Icons.Material.Filled.RemoveRedEye" aria-label="up" style="float: right; padding-top: 0px; padding-bottom: 0px;"></MudIconButton>
+            </MudTooltip>
+        }
+        @if (editBtn)
+        {
+            <MudTooltip Text="@("Edit")" Arrow="true" Placement="Placement.Bottom">
+                <MudIconButton OnClick="Edit" Icon="@Icons.Material.Filled.ModeEdit" aria-label="up" style="float: right; padding-top: 0px; padding-bottom: 0px;"></MudIconButton>
+            </MudTooltip>
+        }
+        @if (deleteBtn)
+        {
+            <MudTooltip Text="@("Delete")" Arrow="true" Placement="Placement.Bottom">
+                <MudIconButton OnClick="Delete" Icon="@Icons.Material.Filled.Delete" aria-label="up" style="float: right; padding-top: 0px; padding-bottom: 0px;"></MudIconButton>
+            </MudTooltip>
+        }
+    </MudButtonGroup>
+</MudListItem>
+
+@code
+{
+    [Parameter]
+    public int? ItemId { get; set; }
+
+    [Parameter]
+    public object? Value { get; set; }
+
+    [Parameter]
+    public string ItemName { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Class { get; set; } = string.Empty;
+
+    [Parameter]
+    public bool UpDown { get; set; } = true;
+
+    [Parameter]
+    public EventCallback<int> Viewable { get; set; }
+
+    [Parameter]
+    public EventCallback<int> Editable { get; set; }
+
+    [Parameter]
+    public EventCallback<int> Deletable { get; set; }
+
+    [Parameter]
+    public EventCallback<int> MoveUp { get; set; }
+
+    [Parameter]
+    public EventCallback<int> MoveDown { get; set; }
+
+    private bool viewBtn = false;
+    private bool editBtn = false;
+    private bool deleteBtn = false;
+    private bool upBtn = false;
+    private bool downBtn = false;
+
+    protected override void OnParametersSet()
+    {
+        if (Viewable.HasDelegate) viewBtn = true;
+        if (Editable.HasDelegate) editBtn = true;
+        if (Deletable.HasDelegate) deleteBtn = true;
+        if (MoveUp.HasDelegate) upBtn = true;
+        if (MoveDown.HasDelegate) downBtn = true;
+        base.OnParametersSet();
+    }
+
+    private async Task View()
+    {
+        if (viewBtn) await Viewable.InvokeAsync();
+    }
+
+    private async Task Edit()
+    {
+        if (editBtn) await Editable.InvokeAsync();
+    }
+
+    private async Task Delete()
+    {
+        if (deleteBtn) await Deletable.InvokeAsync();
+    }
+
+    private async Task Up()
+    {
+        if (upBtn) await MoveUp.InvokeAsync();
+    }
+
+    private async Task Down()
+    {
+        if (downBtn) await MoveDown.InvokeAsync();
+    }
+}
