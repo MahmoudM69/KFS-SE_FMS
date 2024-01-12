@@ -41,21 +41,26 @@ public class Startup
     // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
     public void ConfigureServices(IServiceCollection services)
     {
-        var connectionString = Configuration.GetConnectionString("DefaultConnection") ??
-            throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+        /*
+            IMPORTANT!!!
+
+            PLEASE ADD YOUR CONNECTION STRING HERE OR IN THE `appsettings.json` FILE.
+        */
+        var connectionString = Configuration.GetConnectionString("MySQL") ??
+            throw new InvalidOperationException("Connection string not found.");
         
         services.AddHttpContextAccessor();
         
         services.AddDbContextFactory<AppDbContext>(option => option.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
         services.AddDbContext<AppDbContext>(options => options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
-        services.AddIdentityCore<ApplicationUser>(options =>
+        services.AddIdentity<ApplicationUser, IdentityRole>(options =>
         {
             options.Password.RequiredLength = 8;
             options.Password.RequiredUniqueChars = 3;
             options.User.RequireUniqueEmail = true;
             options.SignIn.RequireConfirmedEmail = false;
-        }).AddRoles<IdentityRole>().AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
+        }).AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
 
         services.AddIdentityCore<Employee>(options =>
         {
@@ -101,7 +106,7 @@ public class Startup
             config.SnackbarConfiguration.BackgroundBlurred = true;
             config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
         });
-        services.AddScoped<IDBInitializer, DBInitializer>();
+        //services.AddScoped<IDBInitializer, DBInitializer>();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

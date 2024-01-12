@@ -131,5 +131,9 @@ public class PageHistoryState : IDisposable
         NavigateTo(currrentUri, forceLoad, addRecord);
     }
 
-    void IDisposable.Dispose() => navigationManager.LocationChanged -= (obj, arg) => NavigateTo(arg.Location, false);
+    void IDisposable.Dispose()
+    {
+        navigationManager.LocationChanged -= (obj, arg) => NavigateTo(arg.Location, false);
+        GC.SuppressFinalize(this);
+    }
 }
